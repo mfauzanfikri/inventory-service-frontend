@@ -73,7 +73,7 @@ export function AddCategoryModal() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save category</Button>
+            <Button type="submit">Save</Button>
           </DialogFooter>
         </DialogContent>
       </form>
