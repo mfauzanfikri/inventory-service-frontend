@@ -86,7 +86,7 @@ export function DeleteCategoryModal(
           >
             {isDeleting ? (
               <>
-                <Spinner /> Deleting...
+                <Spinner /> Delete
               </>
             ) : (
               "Delete"

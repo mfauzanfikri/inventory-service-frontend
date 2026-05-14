@@ -168,7 +168,7 @@ describe('EditCategoryModal', () => {
     // Check loading state
     expect(saveButton).toBeDisabled();
     expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
-    expect(saveButton).toHaveTextContent(/saving/i);
+    expect(saveButton).toHaveTextContent(/save changes/i);
     expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
 
     // Resolve the promise

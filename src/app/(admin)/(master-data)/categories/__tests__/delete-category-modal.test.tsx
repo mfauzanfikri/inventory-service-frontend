@@ -134,7 +134,7 @@ describe('DeleteCategoryModal', () => {
     // Check loading state
     expect(deleteButton).toBeDisabled();
     expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
-    expect(deleteButton).toHaveTextContent(/deleting/i);
+    expect(deleteButton).toHaveTextContent(/delete/i);
     expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
 
     // Resolve the promise

@@ -165,7 +165,7 @@ export function AddCategoryModal() {
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <Spinner /> Saving...
+                  <Spinner /> Save
                 </>
               ) : (
                 "Save"
