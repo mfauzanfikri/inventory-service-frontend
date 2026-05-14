@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeleteCategoryModal } from '../delete-category-modal';
 import { deleteCategoryAction } from '../actions';
 import { Category } from '@/types/category';
+import { toast } from 'sonner';
 
 // Mock the server action
 jest.mock('../actions', () => ({
@@ -12,6 +13,7 @@ jest.mock('../actions', () => ({
 jest.mock('sonner', () => ({
   toast: {
     success: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
@@ -86,5 +88,59 @@ describe('DeleteCategoryModal', () => {
 
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     expect(deleteCategoryAction).not.toHaveBeenCalled();
+  });
+
+  it('should show error toast if deletion fails', async () => {
+    (deleteCategoryAction as jest.Mock).mockRejectedValue(new Error('Async error'));
+
+    render(
+      <DeleteCategoryModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        category={mockCategory}
+      />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to delete category'),
+        expect.any(Object)
+      );
+    });
+  });
+
+  it('should disable buttons and show loading state while deleting', async () => {
+    // Create a promise that we can control
+    let resolveDelete: (value: any) => void;
+    const deletePromise = new Promise((resolve) => {
+      resolveDelete = resolve;
+    });
+    (deleteCategoryAction as jest.Mock).mockReturnValue(deletePromise);
+
+    render(
+      <DeleteCategoryModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        category={mockCategory}
+      />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButton);
+
+    // Check loading state
+    expect(deleteButton).toBeDisabled();
+    expect(deleteButton).toHaveTextContent(/deleting/i);
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
+
+    // Resolve the promise
+    resolveDelete!(undefined);
+
+    await waitFor(() => {
+      expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+    });
   });
 });

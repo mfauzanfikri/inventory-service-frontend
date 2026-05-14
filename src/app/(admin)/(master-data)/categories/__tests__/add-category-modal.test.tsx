@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AddCategoryModal } from '../add-category-modal';
 import { createCategoryAction } from '../actions';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 // Mock the server action
 jest.mock('../actions', () => ({
@@ -17,6 +18,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('sonner', () => ({
   toast: {
     success: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
@@ -81,5 +83,29 @@ describe('AddCategoryModal', () => {
     });
 
     expect(screen.queryByText(/create a new category/i)).not.toBeInTheDocument();
+  });
+
+  it('should show error toast if submission fails', async () => {
+    (createCategoryAction as jest.Mock).mockRejectedValue(new Error('Async error'));
+
+    render(<AddCategoryModal />);
+    fireEvent.click(screen.getByRole('button', { name: /add category/i }));
+
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Electronics' } });
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Tech things' } });
+    
+    // Select status
+    const selectTrigger = screen.getByRole('combobox');
+    fireEvent.click(selectTrigger);
+    fireEvent.click(screen.getByRole('option', { name: /^active$/i }));
+
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to create category'),
+        expect.any(Object)
+      );
+    });
   });
 });

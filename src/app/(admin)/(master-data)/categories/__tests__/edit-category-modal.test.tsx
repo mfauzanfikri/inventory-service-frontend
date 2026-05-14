@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EditCategoryModal } from '../edit-category-modal';
 import { updateCategoryAction } from '../actions';
 import { Category } from '@/types/category';
+import { toast } from 'sonner';
 
 // Mock the server action
 jest.mock('../actions', () => ({
@@ -12,6 +13,7 @@ jest.mock('../actions', () => ({
 jest.mock('sonner', () => ({
   toast: {
     success: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
@@ -114,5 +116,30 @@ describe('EditCategoryModal', () => {
 
     expect(await screen.findByText(/name too short/i)).toBeInTheDocument();
     expect(updateCategoryAction).not.toHaveBeenCalled();
+  });
+
+  it('should show error toast if update fails', async () => {
+    (updateCategoryAction as jest.Mock).mockRejectedValue(new Error('Async error'));
+
+    render(
+      <EditCategoryModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        category={mockCategory}
+      />
+    );
+
+    const nameInput = screen.getByLabelText(/name/i);
+    fireEvent.change(nameInput, { target: { value: 'Updated Electronics' } });
+
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to update category'),
+        expect.any(Object)
+      );
+    });
   });
 });

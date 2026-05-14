@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,23 +26,34 @@ export function DeleteCategoryModal(
     onOpenChange,
     category,
   }: DeleteCategoryModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   if(!category) return null;
 
   const handleDelete = async () => {
-    await deleteCategoryAction(category.id);
+    try {
+      setIsDeleting(true);
+      await deleteCategoryAction(category.id);
 
-    const message = (
-      <span>
-        <b className="font-bold">{category.name}</b> category has been
-        deleted
-      </span>
-    );
+      const message = (
+        <span>
+          <b className="font-bold">{category.name}</b> category has been
+          deleted
+        </span>
+      );
 
-    toast.success(message, {
-      position: "top-center",
-    });
+      toast.success(message, {
+        position: "top-center",
+      });
 
-    onOpenChange(false);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error("Failed to delete category. Please try again.", {
+        position: "top-center",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -60,6 +72,7 @@ export function DeleteCategoryModal(
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
+            disabled={isDeleting}
           >
             Cancel
           </Button>
@@ -68,8 +81,9 @@ export function DeleteCategoryModal(
             type="button"
             variant="destructive"
             onClick={handleDelete}
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

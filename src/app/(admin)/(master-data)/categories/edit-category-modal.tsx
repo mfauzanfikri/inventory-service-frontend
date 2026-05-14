@@ -54,7 +54,7 @@ export function EditCategoryModal({
   const {
     register,
     handleSubmit,
-    formState: { errors, dirtyFields },
+    formState: { errors, dirtyFields, isSubmitting },
     control,
     reset,
   } = useForm<FormData>({
@@ -78,25 +78,31 @@ export function EditCategoryModal({
   if (!category) return null;
 
   const onSubmit = async (data: FormData) => {
-    const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
-      const field = key as keyof FormData;
-      // Cast the value to any to satisfy TS
-      acc[field] = data[field] as any;
-      return acc;
-    }, {} as Partial<FormData>);
+    try {
+      const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
+        const field = key as keyof FormData;
+        // Cast the value to the union of all possible FormData values to satisfy TS
+        acc[field] = data[field] as FormData[keyof FormData];
+        return acc;
+      }, {} as Partial<FormData>);
 
-    if (Object.keys(changedFields).length > 0) {
-      await updateCategoryAction(category.id, changedFields);
+      if (Object.keys(changedFields).length > 0) {
+        await updateCategoryAction(category.id, changedFields);
 
-      toast.success(
-        <span>
-          <b className="font-bold">{data.name}</b> category has been updated
-        </span>,
-        { position: "top-center" }
-      );
+        toast.success(
+          <span>
+            <b className="font-bold">{data.name}</b> category has been updated
+          </span>,
+          { position: "top-center" }
+        );
+      }
+
+      onOpenChange(false);
+    } catch (error) {
+      toast.error("Failed to update category. Please try again.", {
+        position: "top-center",
+      });
     }
-
-    onOpenChange(false);
   };
 
   return (
@@ -166,12 +172,14 @@ export function EditCategoryModal({
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isSubmitting}>
                 Cancel
               </Button>
             </DialogClose>
 
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save changes"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

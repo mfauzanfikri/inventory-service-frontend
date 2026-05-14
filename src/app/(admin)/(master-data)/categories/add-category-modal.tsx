@@ -52,7 +52,7 @@ export function AddCategoryModal() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     control,
     reset,
   } = useForm<FormData>({
@@ -63,16 +63,22 @@ export function AddCategoryModal() {
   const onSubmit = async (
     data: FormData,
   ) => {
-    const createdCategory = await createCategoryAction(data);
+    try {
+      const createdCategory = await createCategoryAction(data);
 
-    const message = <span><b className="font-bold">{createdCategory.name}</b> category has been created</span>;
+      const message = <span><b className="font-bold">{createdCategory.name}</b> category has been created</span>;
 
-    toast.success(message, {
-      position: "top-center",
-    });
+      toast.success(message, {
+        position: "top-center",
+      });
 
-    reset(defaultValues);
-    setOpen(false);
+      reset(defaultValues);
+      setOpen(false);
+    } catch (error) {
+      toast.error("Failed to create category. Please try again.", {
+        position: "top-center",
+      });
+    }
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -153,9 +159,11 @@ export function AddCategoryModal() {
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting}>Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
