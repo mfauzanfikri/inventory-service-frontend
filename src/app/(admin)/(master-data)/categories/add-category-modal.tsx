@@ -163,7 +163,13 @@ export function AddCategoryModal() {
               <Button type="button" variant="outline" disabled={isSubmitting}>Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? <Spinner /> : "Save"}
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Saving...
+                </>
+              ) : (
+                "Save"
+              )}
             </Button>
           </DialogFooter>
         </form>

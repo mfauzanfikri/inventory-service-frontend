@@ -84,7 +84,13 @@ export function DeleteCategoryModal(
             onClick={handleDelete}
             disabled={isDeleting}
           >
-            {isDeleting ? <Spinner /> : "Delete"}
+            {isDeleting ? (
+              <>
+                <Spinner /> Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

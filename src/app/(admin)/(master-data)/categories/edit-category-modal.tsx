@@ -179,7 +179,13 @@ export function EditCategoryModal({
             </DialogClose>
 
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? <Spinner /> : "Save changes"}
+              {isSubmitting ? (
+                <>
+                  <Spinner /> Saving...
+                </>
+              ) : (
+                "Save changes"
+              )}
             </Button>
           </DialogFooter>
         </form>
