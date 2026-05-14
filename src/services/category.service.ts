@@ -1,6 +1,10 @@
 import { Category } from "@/types/category";
-import { getAllCategories } from "@/repositories/category.repository";
+import { categoryRepository } from "@/repositories/category.repository";
 
-export async function getCategories(): Promise<Category[]> {
-  return getAllCategories();
+async function getAll(): Promise<Category[]> {
+  return categoryRepository.getAll();
 }
+
+export const categoryService = {
+  getAll,
+};

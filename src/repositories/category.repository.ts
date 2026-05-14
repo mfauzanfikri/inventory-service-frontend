@@ -1,6 +1,6 @@
 import { Category } from "@/types/category";
 
-export async function getAllCategories(): Promise<Category[]> {
+async function getAll(): Promise<Category[]> {
   const categoriesData = [
     ["Electronics", "Devices and electronic items"],
     ["Furniture", "Home and office furniture"],
@@ -61,3 +61,7 @@ export async function getAllCategories(): Promise<Category[]> {
     status: index % 5 === 0 ? "inactive" : "active",
   }));
 }
+
+export const categoryRepository = {
+  getAll,
+};
