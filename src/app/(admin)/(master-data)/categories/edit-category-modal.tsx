@@ -54,7 +54,7 @@ export function EditCategoryModal({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     control,
     reset,
   } = useForm<FormData>({
@@ -74,17 +74,24 @@ export function EditCategoryModal({
   if (!category) return null;
 
   const onSubmit = async (data: FormData) => {
-    await updateCategoryAction(category.id, data);
+    // 1. Filter only changed fields
+    const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
+      const field = key as keyof FormData;
+      acc[field] = data[field];
+      return acc;
+    }, {} as Partial<FormData>);
 
-    const message = (
-      <span>
-        <b className="font-bold">{data.name}</b> category has been updated
-      </span>
-    );
+    // 2. Only call the action if something actually changed
+    if (Object.keys(changedFields).length > 0) {
+      await updateCategoryAction(category.id, changedFields);
 
-    toast.success(message, {
-      position: "top-center",
-    });
+      toast.success(
+        <span>
+          <b className="font-bold">{data.name}</b> category has been updated
+        </span>,
+        { position: "top-center" }
+      );
+    }
 
     onOpenChange(false);
   };
