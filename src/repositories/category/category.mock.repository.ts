@@ -89,7 +89,7 @@ async function update(id: string, data: UpdateCategoryInput): Promise<Category> 
   return categories[index];
 }
 
-async function delete(id: string): Promise<void> {
+async function deleteCategory(id: string): Promise<void> {
   const index = categories.findIndex((c) => c.id === id);
   if (index !== -1) {
     categories.splice(index, 1);
@@ -101,6 +101,6 @@ export function createMockCategoryRepository(): CategoryRepository {
     getAll,
     create,
     update,
-    delete,
+    delete: deleteCategory,
   };
 }

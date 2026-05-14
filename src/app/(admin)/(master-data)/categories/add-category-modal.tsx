@@ -20,8 +20,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Controller, DefaultValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categoryService } from "@/services/category.service";
 import { useRouter } from "next/navigation";
+import { createCategoryAction } from "@/app/(admin)/(master-data)/categories/actions";
 
 const statusOptions = ["active", "inactive"] as const;
 
@@ -81,7 +81,7 @@ export function AddCategoryModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Category</Button>
+        <Button variant="outline">Add</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>

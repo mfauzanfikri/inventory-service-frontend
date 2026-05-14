@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/types/category";
+import { deleteCategoryAction } from "./actions";
+import { toast } from "sonner";
 
 interface DeleteCategoryModalProps {
   open: boolean;
@@ -26,9 +28,18 @@ export function DeleteCategoryModal(
   if(!category) return null;
 
   const handleDelete = async () => {
-    console.log("Delete category:", category.id);
+    await deleteCategoryAction(category.id);
 
-    // await categoryService.deleteCategory(category.id);
+    const message = (
+      <span>
+        <b className="font-bold">{category.name}</b> category has been
+        deleted
+      </span>
+    );
+
+    toast.success(message, {
+      position: "top-center",
+    });
 
     onOpenChange(false);
   };
