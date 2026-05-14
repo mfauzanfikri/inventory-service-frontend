@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeleteCategoryModal } from '../delete-category-modal';
-import { deleteCategoryAction } from '../actions';
+import { deleteCategoryAction } from '../../actions';
 import { Category } from '@/types/category';
 import { toast } from 'sonner';
 
 // Mock the server action
-jest.mock('../actions', () => ({
+jest.mock('../../actions', () => ({
   deleteCategoryAction: jest.fn(),
 }));
 

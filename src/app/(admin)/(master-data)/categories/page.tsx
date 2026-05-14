@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { categoryService } from "@/services/category.service";
-import { CategoryTable } from "./category-table";
+import { CategoryTable } from "./_components/category-table";
 
 export const metadata: Metadata = {
   title: "Categories",

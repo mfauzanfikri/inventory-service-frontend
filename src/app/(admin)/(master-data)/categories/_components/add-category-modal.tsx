@@ -22,7 +22,7 @@ import { z } from "zod";
 import { Controller, DefaultValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { createCategoryAction } from "@/app/(admin)/(master-data)/categories/actions";
+import { createCategoryAction } from "../actions";
 
 const statusOptions = ["active", "inactive"] as const;
 

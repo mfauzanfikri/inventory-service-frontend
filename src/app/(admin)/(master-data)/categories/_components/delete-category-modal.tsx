@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Category } from "@/types/category";
-import { deleteCategoryAction } from "./actions";
+import { deleteCategoryAction } from "../actions";
 import { toast } from "sonner";
 
 interface DeleteCategoryModalProps {

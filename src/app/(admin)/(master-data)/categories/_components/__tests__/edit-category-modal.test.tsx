@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EditCategoryModal } from '../edit-category-modal';
-import { updateCategoryAction } from '../actions';
+import { updateCategoryAction } from '../../actions';
 import { Category } from '@/types/category';
 import { toast } from 'sonner';
 
 // Mock the server action
-jest.mock('../actions', () => ({
+jest.mock('../../actions', () => ({
   updateCategoryAction: jest.fn(),
 }));
 

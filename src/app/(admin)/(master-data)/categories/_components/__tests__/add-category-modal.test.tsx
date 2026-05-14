@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AddCategoryModal } from '../add-category-modal';
-import { createCategoryAction } from '../actions';
+import { createCategoryAction } from '../../actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 // Mock the server action
-jest.mock('../actions', () => ({
+jest.mock('../../actions', () => ({
   createCategoryAction: jest.fn(),
 }));
 
