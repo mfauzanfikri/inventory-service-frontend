@@ -1,48 +1,71 @@
-import { categoryService } from '../category.service';
+import { createCategoryService } from '../category.service';
 import { CreateCategoryInput, UpdateCategoryInput } from '@/types/category';
 
 describe('CategoryService', () => {
-  it('should get all categories', async () => {
-    const categories = await categoryService.getAll();
-    expect(Array.isArray(categories)).toBe(true);
-    expect(categories.length).toBeGreaterThan(0);
+  // Define our mock repository
+  const mockRepository = {
+    getAll: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  // Create an isolated service instance injecting the mock repository
+  const service = createCategoryService(mockRepository);
+
+  beforeEach(() => {
+    // Clear mock call history before each test to ensure complete isolation
+    jest.clearAllMocks();
   });
 
-  it('should create a new category', async () => {
+  it('should get all categories by calling repository.getAll', async () => {
+    const mockData = [{ id: '1', name: 'Mock Cat', description: 'Desc', status: 'active' as const }];
+    mockRepository.getAll.mockResolvedValue(mockData);
+
+    const categories = await service.getAll();
+    
+    expect(mockRepository.getAll).toHaveBeenCalledTimes(1);
+    expect(categories).toEqual(mockData);
+  });
+
+  it('should create a new category by calling repository.create', async () => {
     const input: CreateCategoryInput = {
       name: 'New Test Category',
       description: 'Test description',
       status: 'active',
     };
-    const newCategory = await categoryService.create(input);
-    expect(newCategory).toMatchObject(input);
-    expect(newCategory.id).toBeDefined();
+    const expectedOutput = { id: 'generated-id', ...input };
+    mockRepository.create.mockResolvedValue(expectedOutput);
 
-    const categories = await categoryService.getAll();
-    expect(categories[0]).toEqual(newCategory); // Should be newest first
+    const newCategory = await service.create(input);
+    
+    expect(mockRepository.create).toHaveBeenCalledWith(input);
+    expect(mockRepository.create).toHaveBeenCalledTimes(1);
+    expect(newCategory).toEqual(expectedOutput);
   });
 
-  it('should update an existing category', async () => {
-    const categories = await categoryService.getAll();
-    const target = categories[0];
+  it('should update an existing category by calling repository.update', async () => {
+    const id = 'target-id';
     const updateInput: UpdateCategoryInput = {
       name: 'Updated Name',
     };
+    const expectedOutput = { id, name: 'Updated Name', description: 'Old desc', status: 'active' as const };
+    mockRepository.update.mockResolvedValue(expectedOutput);
 
-    const updated = await categoryService.update(target.id, updateInput);
-    expect(updated.name).toBe('Updated Name');
-    expect(updated.id).toBe(target.id);
-    expect(updated.description).toBe(target.description);
+    const updated = await service.update(id, updateInput);
+    
+    expect(mockRepository.update).toHaveBeenCalledWith(id, updateInput);
+    expect(mockRepository.update).toHaveBeenCalledTimes(1);
+    expect(updated).toEqual(expectedOutput);
   });
 
-  it('should delete a category', async () => {
-    const categoriesBefore = await categoryService.getAll();
-    const targetId = categoriesBefore[0].id;
+  it('should delete a category by calling repository.delete', async () => {
+    const id = 'target-id';
+    mockRepository.delete.mockResolvedValue(undefined);
 
-    await categoryService.delete(targetId);
-
-    const categoriesAfter = await categoryService.getAll();
-    expect(categoriesAfter.length).toBe(categoriesBefore.length - 1);
-    expect(categoriesAfter.find((c) => c.id === targetId)).toBeUndefined();
+    await service.delete(id);
+    
+    expect(mockRepository.delete).toHaveBeenCalledWith(id);
+    expect(mockRepository.delete).toHaveBeenCalledTimes(1);
   });
 });
