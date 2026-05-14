@@ -5,6 +5,7 @@ import { Category } from "@/types/category";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 export const columns: ColumnDef<Category>[] = [
   {
@@ -55,7 +56,7 @@ export const columns: ColumnDef<Category>[] = [
 
       return (
         <div className="text-center">
-          <Badge variant={value === 'active' ? 'default' : 'destructive'}>{value}</Badge>
+          <Badge variant={value === 'active' ? 'default' : 'destructive'}>{capitalizeFirstLetter(value)}</Badge>
         </div>
       );
     }
