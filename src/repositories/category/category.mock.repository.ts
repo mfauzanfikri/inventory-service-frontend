@@ -1,4 +1,5 @@
 import { Category } from "@/types/category";
+import { CategoryRepository } from "@/repositories/category/category.repository";
 
 async function getAll(): Promise<Category[]> {
   const categoriesData = [
@@ -62,6 +63,8 @@ async function getAll(): Promise<Category[]> {
   }));
 }
 
-export const categoryRepository = {
-  getAll,
-};
+export function createMockCategoryRepository(): CategoryRepository {
+  return {
+    getAll,
+  };
+}

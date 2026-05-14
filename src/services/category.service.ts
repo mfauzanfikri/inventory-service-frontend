@@ -1,10 +1,14 @@
-import { Category } from "@/types/category";
-import { categoryRepository } from "@/repositories/category.repository";
+import { createMockCategoryRepository } from "@/repositories/category/category.mock.repository";
+import type { CategoryRepository } from "@/repositories/category/category.repository";
 
-async function getAll(): Promise<Category[]> {
-  return categoryRepository.getAll();
+export function createCategoryService(
+  repository: CategoryRepository = createMockCategoryRepository()
+) {
+  return {
+    async getAll() {
+      return repository.getAll();
+    },
+  };
 }
 
-export const categoryService = {
-  getAll,
-};
+export const categoryService = createCategoryService();
