@@ -1,70 +1,106 @@
-import { Category } from "@/types/category";
+import { Category, CreateCategoryInput, UpdateCategoryInput } from "@/types/category";
 import { CategoryRepository } from "@/repositories/category/category.repository";
 
-async function getAll(): Promise<Category[]> {
-  const categoriesData = [
-    ["Electronics", "Devices and electronic items"],
-    ["Furniture", "Home and office furniture"],
-    ["Stationery", "Office supplies and stationery items"],
-    ["Groceries", "Daily household consumables"],
-    ["Clothing", "Apparel and fashion items"],
-    ["Automotive", "Vehicle parts and accessories"],
-    ["Books", "Printed books and reading materials"],
-    ["Sports", "Sports equipment and fitness gear"],
-    ["Beauty", "Beauty and personal care products"],
-    ["Toys", "Toys, games, and hobby items"],
-    ["Kitchenware", "Cooking tools and kitchen supplies"],
-    ["Garden", "Gardening tools and outdoor supplies"],
-    ["Hardware", "Tools, fasteners, and repair supplies"],
-    ["Health", "Health care and wellness products"],
-    ["Pet Supplies", "Food and accessories for pets"],
-    ["Baby Products", "Baby care and nursery essentials"],
-    ["Footwear", "Shoes, sandals, and related accessories"],
-    ["Jewelry", "Jewelry and fashion accessories"],
-    ["Music", "Musical instruments and audio accessories"],
-    ["Office Equipment", "Office machines and workplace equipment"],
-    ["Cleaning", "Cleaning products and sanitation supplies"],
-    ["Beverages", "Drinks and beverage supplies"],
-    ["Snacks", "Packaged snacks and light food items"],
-    ["Frozen Foods", "Frozen meals and refrigerated goods"],
-    ["Bakery", "Bread, cakes, and bakery products"],
-    ["Dairy", "Milk, cheese, and dairy products"],
-    ["Meat", "Fresh and packaged meat products"],
-    ["Seafood", "Fish, shellfish, and seafood products"],
-    ["Produce", "Fresh fruit and vegetables"],
-    ["Pharmacy", "Medicine and pharmacy supplies"],
-    ["Travel", "Travel bags and trip accessories"],
-    ["Luggage", "Suitcases and storage bags"],
-    ["Mobile Accessories", "Phone cases, chargers, and cables"],
-    ["Computer Accessories", "Keyboards, mice, and computer peripherals"],
-    ["Networking", "Routers, switches, and network equipment"],
-    ["Cameras", "Cameras and photography accessories"],
-    ["Gaming", "Gaming consoles and accessories"],
-    ["Lighting", "Lamps, bulbs, and lighting fixtures"],
-    ["Bedding", "Sheets, pillows, and bedding sets"],
-    ["Bathroom", "Bathroom fixtures and accessories"],
-    ["Decor", "Home decoration and interior accents"],
-    ["Storage", "Boxes, shelves, and storage organizers"],
-    ["Safety", "Safety equipment and protective gear"],
-    ["Industrial", "Industrial tools and materials"],
-    ["Packaging", "Boxes, wraps, and packaging supplies"],
-    ["Paper Goods", "Paper products and disposable supplies"],
-    ["Art Supplies", "Paint, brushes, and creative materials"],
-    ["Crafts", "Crafting tools and hobby supplies"],
-    ["Seasonal", "Seasonal decorations and event items"],
-    ["Gifts", "Gift items and special occasion products"],
-  ];
+// Persistent state in memory during development (survives HMR)
+const globalForCategories = globalThis as unknown as { mockCategories: Category[] };
 
-  return categoriesData.map(([name, description], index) => ({
-    id: `category-${String(index + 1).padStart(2, "0")}`,
-    name,
-    description,
-    status: index % 5 === 0 ? "inactive" : "active",
-  }));
+let categories: Category[] = globalForCategories.mockCategories || [
+  ["Electronics", "Devices and electronic items"],
+  ["Furniture", "Home and office furniture"],
+  ["Stationery", "Office supplies and stationery items"],
+  ["Groceries", "Daily household consumables"],
+  ["Clothing", "Apparel and fashion items"],
+  ["Automotive", "Vehicle parts and accessories"],
+  ["Books", "Printed books and reading materials"],
+  ["Sports", "Sports equipment and fitness gear"],
+  ["Beauty", "Beauty and personal care products"],
+  ["Toys", "Toys, games, and hobby items"],
+  ["Kitchenware", "Cooking tools and kitchen supplies"],
+  ["Garden", "Gardening tools and outdoor supplies"],
+  ["Hardware", "Tools, fasteners, and repair supplies"],
+  ["Health", "Health care and wellness products"],
+  ["Pet Supplies", "Food and accessories for pets"],
+  ["Baby Products", "Baby care and nursery essentials"],
+  ["Footwear", "Shoes, sandals, and related accessories"],
+  ["Jewelry", "Jewelry and fashion accessories"],
+  ["Music", "Musical instruments and audio accessories"],
+  ["Office Equipment", "Office machines and workplace equipment"],
+  ["Cleaning", "Cleaning products and sanitation supplies"],
+  ["Beverages", "Drinks and beverage supplies"],
+  ["Snacks", "Packaged snacks and light food items"],
+  ["Frozen Foods", "Frozen meals and refrigerated goods"],
+  ["Bakery", "Bread, cakes, and bakery products"],
+  ["Dairy", "Milk, cheese, and dairy products"],
+  ["Meat", "Fresh and packaged meat products"],
+  ["Seafood", "Fish, shellfish, and seafood products"],
+  ["Produce", "Fresh fruit and vegetables"],
+  ["Pharmacy", "Medicine and pharmacy supplies"],
+  ["Travel", "Travel bags and trip accessories"],
+  ["Luggage", "Suitcases and storage bags"],
+  ["Mobile Accessories", "Phone cases, chargers, and cables"],
+  ["Computer Accessories", "Keyboards, mice, and computer peripherals"],
+  ["Networking", "Routers, switches, and network equipment"],
+  ["Cameras", "Cameras and photography accessories"],
+  ["Gaming", "Gaming consoles and accessories"],
+  ["Lighting", "Lamps, bulbs, and lighting fixtures"],
+  ["Bedding", "Sheets, pillows, and bedding sets"],
+  ["Bathroom", "Bathroom fixtures and accessories"],
+  ["Decor", "Home decoration and interior accents"],
+  ["Storage", "Boxes, shelves, and storage organizers"],
+  ["Safety", "Safety equipment and protective gear"],
+  ["Industrial", "Industrial tools and materials"],
+  ["Packaging", "Boxes, wraps, and packaging supplies"],
+  ["Paper Goods", "Paper products and disposable supplies"],
+  ["Art Supplies", "Paint, brushes, and creative materials"],
+  ["Crafts", "Crafting tools and hobby supplies"],
+  ["Seasonal", "Seasonal decorations and event items"],
+  ["Gifts", "Gift items and special occasion products"],
+].map(([name, description], index) => ({
+  id: `category-${String(index + 1).padStart(2, "0")}`,
+  name,
+  description,
+  status: index % 5 === 0 ? "inactive" : "active",
+}));
+
+if (process.env.NODE_ENV !== "production") {
+  globalForCategories.mockCategories = categories;
+}
+
+async function getAll(): Promise<Category[]> {
+  // Return reversed copy so new items appear at the top
+  return [...categories].reverse();
+}
+
+async function create(data: CreateCategoryInput): Promise<Category> {
+  const newCategory: Category = {
+    id: `category-${String(categories.length + 1).padStart(2, "0")}`,
+    ...data,
+  };
+
+  categories.push(newCategory);
+  return newCategory;
+}
+
+async function update(id: string, data: UpdateCategoryInput): Promise<Category> {
+  const index = categories.findIndex((c) => c.id === id);
+  if (index === -1) throw new Error("Category not found");
+
+  categories[index] = { ...categories[index], ...data };
+  return categories[index];
+}
+
+async function delete(id: string): Promise<void> {
+  const index = categories.findIndex((c) => c.id === id);
+  if (index !== -1) {
+    categories.splice(index, 1);
+  }
 }
 
 export function createMockCategoryRepository(): CategoryRepository {
   return {
     getAll,
+    create,
+    update,
+    delete,
   };
 }

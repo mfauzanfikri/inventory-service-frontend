@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,73 +11,149 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Controller, DefaultValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { categoryService } from "@/services/category.service";
+import { useRouter } from "next/navigation";
+
+const statusOptions = ["active", "inactive"] as const;
+
+const schema = z.object({
+  name: z.string().min(3, "Name too short"),
+  description: z.string().min(1, "Description is required"),
+  status: z.enum(statusOptions, {
+    error: "Please select a valid status",
+  }),
+});
+
+type FormData = z.infer<typeof schema>;
+
+const defaultValues: DefaultValues<FormData> = {
+  name: "",
+  description: "",
+  status: undefined,
+};
 
 export function AddCategoryModal() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues
+  });
+
+  const onSubmit = async (
+    data: FormData,
+  ) => {
+    const createdCategory = await createCategoryAction(data);
+
+    const message = <span><b className="font-bold">{createdCategory.name}</b> category has been created</span>;
+
+    toast.success(message, {
+      position: "top-center",
+    });
+
+    reset(defaultValues);
+    setOpen(false);
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+
+    if(nextOpen) {
+      reset(defaultValues);
+    }
+  };
+
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">Add Category</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Category</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Add category</DialogTitle>
             <DialogDescription>
               Create a new category for grouping inventory items.
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="category-name">Name</Label>
+          <FieldGroup className="py-4">
+            <Field data-invalid={!!errors.name}>
+              <FieldLabel htmlFor="category-name">Name</FieldLabel>
               <Input
                 id="category-name"
-                name="name"
-                placeholder="Electronics"
-                required
+                {...register("name")}
+                aria-invalid={!!errors.name}
               />
+              {errors.name && (
+                <FieldError>{errors.name.message}</FieldError>
+              )}
             </Field>
-            <Field>
-              <Label htmlFor="category-description">Description</Label>
+
+            <Field data-invalid={!!errors.description}>
+              <FieldLabel htmlFor="category-description">Description</FieldLabel>
               <Textarea
                 id="category-description"
-                name="description"
-                placeholder="Devices and electronic items"
-                required
+                {...register("description")}
+                aria-invalid={!!errors.description}
               />
+              {errors.description && (
+                <FieldError>{errors.description.message}</FieldError>
+              )}
             </Field>
-            <Field>
-              <Label htmlFor="category-status">Status</Label>
-              <Select name="status" defaultValue="active">
-                <SelectTrigger id="category-status" className="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="status">Status</FieldLabel>
+
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="status"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
             <Button type="submit">Save</Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
-  )
+  );
 }
