@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Category } from "@/types/category";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogClose,
@@ -178,7 +179,7 @@ export function EditCategoryModal({
             </DialogClose>
 
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save changes"}
+              {isSubmitting ? <Spinner /> : "Save changes"}
             </Button>
           </DialogFooter>
         </form>

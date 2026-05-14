@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogClose,
@@ -162,7 +163,7 @@ export function AddCategoryModal() {
               <Button type="button" variant="outline" disabled={isSubmitting}>Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save"}
+              {isSubmitting ? <Spinner /> : "Save"}
             </Button>
           </DialogFooter>
         </form>

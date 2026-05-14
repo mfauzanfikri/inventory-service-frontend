@@ -108,4 +108,39 @@ describe('AddCategoryModal', () => {
       );
     });
   });
+
+  it('should disable buttons and show loading state while creating', async () => {
+    // Create a promise that we can control
+    let resolveCreate: (value: any) => void;
+    const createPromise = new Promise((resolve) => {
+      resolveCreate = resolve;
+    });
+    (createCategoryAction as jest.Mock).mockReturnValue(createPromise);
+
+    render(<AddCategoryModal />);
+    fireEvent.click(screen.getByRole('button', { name: /add category/i }));
+
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Electronics' } });
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Tech things' } });
+    
+    // Select status
+    const selectTrigger = screen.getByRole('combobox');
+    fireEvent.click(selectTrigger);
+    fireEvent.click(screen.getByRole('option', { name: /^active$/i }));
+
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
+
+    // Check loading state
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
+
+    // Resolve the promise
+    resolveCreate!({ id: '1', name: 'Electronics' });
+
+    await waitFor(() => {
+      expect(screen.queryByText(/create a new category/i)).not.toBeInTheDocument();
+    });
+  });
 });

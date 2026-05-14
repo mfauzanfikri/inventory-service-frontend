@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Category } from "@/types/category";
 import { deleteCategoryAction } from "./actions";
 import { toast } from "sonner";
@@ -83,7 +84,7 @@ export function DeleteCategoryModal(
             onClick={handleDelete}
             disabled={isDeleting}
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? <Spinner /> : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

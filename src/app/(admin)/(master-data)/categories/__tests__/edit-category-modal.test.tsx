@@ -142,4 +142,39 @@ describe('EditCategoryModal', () => {
       );
     });
   });
+
+  it('should disable buttons and show loading state while updating', async () => {
+    // Create a promise that we can control
+    let resolveUpdate: (value: any) => void;
+    const updatePromise = new Promise((resolve) => {
+      resolveUpdate = resolve;
+    });
+    (updateCategoryAction as jest.Mock).mockReturnValue(updatePromise);
+
+    render(
+      <EditCategoryModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        category={mockCategory}
+      />
+    );
+
+    const nameInput = screen.getByLabelText(/name/i);
+    fireEvent.change(nameInput, { target: { value: 'Updated Electronics' } });
+
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
+    fireEvent.click(saveButton);
+
+    // Check loading state
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
+
+    // Resolve the promise
+    resolveUpdate!({ ...mockCategory, name: 'Updated Electronics' });
+
+    await waitFor(() => {
+      expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
 });
