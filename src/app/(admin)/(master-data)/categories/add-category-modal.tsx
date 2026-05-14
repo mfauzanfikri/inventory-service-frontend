@@ -38,7 +38,12 @@ type FormData = z.infer<typeof schema>;
 const defaultValues: DefaultValues<FormData> = {
   name: "",
   description: "",
-  status: undefined,
+  /**
+   * Initialize as empty string to keep the Radix Select controlled from the start.
+   * This prevents the "changing from uncontrolled to controlled" warning.
+   * We cast to a valid status to satisfy the strict Zod enum type.
+   */
+  status: "" as "active",
 };
 
 export function AddCategoryModal() {
@@ -81,7 +86,7 @@ export function AddCategoryModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add</Button>
+        <Button variant="outline">Add Category</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>

@@ -66,7 +66,11 @@ export function EditCategoryModal({
       reset({
         name: category.name,
         description: category.description,
-        status: category.status,
+        /**
+         * Fallback to empty string to keep Select component controlled.
+         * This prevents React warnings when switching from undefined to a string value.
+         */
+        status: category.status ?? ("" as "active"),
       });
     }
   }, [category, open, reset]);
@@ -74,14 +78,13 @@ export function EditCategoryModal({
   if (!category) return null;
 
   const onSubmit = async (data: FormData) => {
-    // 1. Filter only changed fields
     const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
       const field = key as keyof FormData;
-      acc[field] = data[field];
+      // Cast the value to any to satisfy TS
+      acc[field] = data[field] as any;
       return acc;
     }, {} as Partial<FormData>);
 
-    // 2. Only call the action if something actually changed
     if (Object.keys(changedFields).length > 0) {
       await updateCategoryAction(category.id, changedFields);
 
