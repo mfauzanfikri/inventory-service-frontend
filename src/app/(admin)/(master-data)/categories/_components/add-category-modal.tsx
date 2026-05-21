@@ -93,7 +93,7 @@ export function AddCategoryModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Category</Button>
+        <Button className="bg-blue-500 hover:bg-blue-600">Add Category</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>

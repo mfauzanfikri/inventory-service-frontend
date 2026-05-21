@@ -1,10 +1,10 @@
 "use server";
 
 import { categoryService } from "@/services/category.service";
-import { CreateCategoryInput, UpdateCategoryInput } from "@/types/category";
+import { CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
 import { revalidatePath } from "next/cache";
 
-export async function createCategoryAction(data: CreateCategoryInput) {
+export async function createCategoryAction(data: CategoryCreateInput) {
   // This runs on the server, so it modifies the server's memory
   const result = await categoryService.create(data);
   
@@ -14,7 +14,7 @@ export async function createCategoryAction(data: CreateCategoryInput) {
   return result;
 }
 
-export async function updateCategoryAction(id: string, data: UpdateCategoryInput) {
+export async function updateCategoryAction(id: string, data: CategoryUpdateInput) {
   const result = await categoryService.update(id, data);
   revalidatePath("/categories");
   return result;

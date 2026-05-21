@@ -1,8 +1,9 @@
-import { Category, CreateCategoryInput, UpdateCategoryInput } from "@/types/category";
+import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
 
 export type CategoryRepository = {
-  getAll(): Promise<Category[]>;
-  create(data: CreateCategoryInput): Promise<Category>;
-  update(id: string, data: UpdateCategoryInput): Promise<Category>;
-  delete(id: string): Promise<void>;
+  findAll(): Promise<Category[]>;
+  findByName(name: string): Promise<Category | null>;
+  create(data: CategoryCreateInput): Promise<Category>;
+  update(id: string, data: CategoryUpdateInput): Promise<Category | null>;
+  delete(id: string): Promise<Category | null>;
 };

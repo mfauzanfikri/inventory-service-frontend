@@ -21,10 +21,6 @@ export default async function CategoriesPage() {
       <PageBreadcrumb pageTitle="Categories" />
 
       <Card>
-        <CardHeader>
-          <CardTitle>Categories</CardTitle>
-        </CardHeader>
-
         <CardContent>
           <CategoryTable data={data} />
         </CardContent>

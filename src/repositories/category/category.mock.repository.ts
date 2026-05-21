@@ -1,4 +1,4 @@
-import { Category, CreateCategoryInput, UpdateCategoryInput } from "@/types/category";
+import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
 import { CategoryRepository } from "@/repositories/category/category.repository";
 
 // Persistent state in memory during development (survives HMR)
@@ -62,16 +62,28 @@ let categories: Category[] = globalForCategories.mockCategories || [
   status: index % 5 === 0 ? "inactive" : "active",
 }));
 
-if (process.env.NODE_ENV !== "production") {
+if(process.env.NODE_ENV !== "production") {
   globalForCategories.mockCategories = categories;
 }
 
-async function getAll(): Promise<Category[]> {
+async function findAll(): Promise<Category[]> {
   // Return reversed copy so new items appear at the top
   return [...categories].reverse();
 }
 
-async function create(data: CreateCategoryInput): Promise<Category> {
+async function findByName(name: string): Promise<Category | null> {
+  const category = categories.find((val) => val.name === name);
+  return category ?? null;
+}
+
+async function create(data: CategoryCreateInput): Promise<Category> {
+  const hasDuplicateName = categories.some((category) => category.name === data.name);
+  if(hasDuplicateName) {
+    const error = new Error(`Category with name ${data.name} already exists`);
+    (error as Error & { status?: number }).status = 409;
+    throw error;
+  }
+
   const newCategory: Category = {
     id: `category-${String(categories.length + 1).padStart(2, "0")}`,
     ...data,
@@ -81,24 +93,39 @@ async function create(data: CreateCategoryInput): Promise<Category> {
   return newCategory;
 }
 
-async function update(id: string, data: UpdateCategoryInput): Promise<Category> {
+async function update(id: string, data: CategoryUpdateInput): Promise<Category | null> {
   const index = categories.findIndex((c) => c.id === id);
-  if (index === -1) throw new Error("Category not found");
+  if(index === -1) {
+    return null;
+  }
+
+  if(data.name) {
+    const duplicateName = categories.some((category) => category.id !== id && category.name === data.name);
+    if(duplicateName) {
+      const error = new Error(`Category with name ${data.name} already exists`);
+      (error as Error & { status?: number }).status = 409;
+      throw error;
+    }
+  }
 
   categories[index] = { ...categories[index], ...data };
   return categories[index];
 }
 
-async function deleteCategory(id: string): Promise<void> {
+async function deleteCategory(id: string): Promise<Category | null> {
   const index = categories.findIndex((c) => c.id === id);
-  if (index !== -1) {
-    categories.splice(index, 1);
+  if(index !== -1) {
+    const [deletedCategory] = categories.splice(index, 1);
+    return deletedCategory;
   }
+
+  return null;
 }
 
 export function createMockCategoryRepository(): CategoryRepository {
   return {
-    getAll,
+    findAll,
+    findByName,
     create,
     update,
     delete: deleteCategory,

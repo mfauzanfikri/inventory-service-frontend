@@ -5,6 +5,6 @@ export type Category = {
   status: "active" | "inactive"
 }
 
-export type CreateCategoryInput = Omit<Category, "id">
+export type CategoryCreateInput = Omit<Category, "id">
 
-export type UpdateCategoryInput = Partial<CreateCategoryInput>
+export type CategoryUpdateInput = Partial<CategoryCreateInput>
