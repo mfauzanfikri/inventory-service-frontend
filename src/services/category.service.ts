@@ -14,6 +14,10 @@ function mapCategoryError(error: unknown): AppError {
     typeof error === "object" && error !== null && "message" in error
       ? (error as { message?: unknown }).message
       : undefined;
+  const details =
+    typeof error === "object" && error !== null && "details" in error
+      ? (error as { details?: unknown }).details
+      : undefined;
 
   if(
     code === "CATEGORY_NAME_CONFLICT" ||
@@ -33,6 +37,26 @@ function mapCategoryError(error: unknown): AppError {
       code: "NOT_FOUND",
       message: typeof message === "string" && message.length > 0 ? message : "Category not found",
       category: "domain",
+    };
+  }
+
+  if(code === "INFRASTRUCTURE" || code === "INFRASTRUCTURE_ERROR") {
+    return infrastructureError(typeof message === "string" && message.length > 0 ? message : undefined);
+  }
+
+  if(code === "VALIDATION_ERROR") {
+    const field =
+      typeof details === "object" &&
+      details !== null &&
+      !Array.isArray(details)
+        ? Object.keys(details as Record<string, unknown>)[0]
+        : undefined;
+
+    return {
+      code: "VALIDATION_ERROR",
+      message: typeof message === "string" && message.length > 0 ? message : "Validation failed",
+      category: "application",
+      field,
     };
   }
 

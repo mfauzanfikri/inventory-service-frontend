@@ -1,6 +1,23 @@
 import { CategoryDomainRepository } from "@/domain/category";
 import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
 
+type ApiSuccess<T> = {
+  success: true;
+  message: string;
+  data: T;
+};
+
+type ApiFailure = {
+  success: false;
+  code?: string;
+  message?: string;
+  errors?: Record<string, string[]>;
+  meta?: {
+    timestamp: string;
+    path: string;
+  };
+};
+
 type HttpRepositoryError = Error & {
   status?: number;
   code?: string;
@@ -28,6 +45,22 @@ function resolveBaseUrl(): string {
   );
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isApiSuccess<T>(value: unknown): value is ApiSuccess<T> {
+  return (
+    isObject(value) &&
+    value.success === true &&
+    "data" in value
+  );
+}
+
+function isApiFailure(value: unknown): value is ApiFailure {
+  return isObject(value) && value.success === false;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${resolveBaseUrl()}${path}`, {
     ...init,
@@ -43,30 +76,46 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       return undefined as T;
     }
 
-    return (await response.json()) as T;
+    const payload = (await response.json()) as unknown;
+    if(isApiSuccess<T>(payload)) {
+      return payload.data;
+    }
+
+    // Backward-safe fallback if endpoint is not yet envelope-based.
+    return payload as T;
   }
 
-  let payload: { message?: unknown; error?: unknown } | undefined;
+  let payload: unknown;
   try {
-    payload = (await response.json()) as { message?: unknown; error?: unknown };
+    payload = (await response.json()) as unknown;
   } catch {
     payload = undefined;
   }
 
+  const failurePayload = isApiFailure(payload) ? payload : undefined;
+  const payloadAsRecord = isObject(payload) ? payload : undefined;
+
   const message =
-    (typeof payload?.message === "string" && payload.message) ||
-    (Array.isArray(payload?.message) ? String(payload?.message[0]) : undefined) ||
+    (typeof failurePayload?.message === "string" && failurePayload.message) ||
+    (typeof payloadAsRecord?.message === "string" && payloadAsRecord.message) ||
+    (Array.isArray(payloadAsRecord?.message) ? String(payloadAsRecord.message[0]) : undefined) ||
     response.statusText ||
     "Request failed";
 
   const code =
-    response.status === 404
+    (typeof failurePayload?.code === "string" && failurePayload.code) ||
+    (response.status === 404
       ? "NOT_FOUND"
       : response.status === 409
         ? "CONFLICT"
-        : undefined;
+        : undefined);
 
-  throw createHttpRepositoryError(message, response.status, code, payload);
+  throw createHttpRepositoryError(
+    message,
+    response.status,
+    code,
+    failurePayload?.errors ?? payload,
+  );
 }
 
 export function createHttpCategoryRepository(): CategoryDomainRepository {

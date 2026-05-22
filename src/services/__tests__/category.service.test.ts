@@ -112,4 +112,23 @@ describe("CategoryService", () => {
       expect(result.error.code).toBe("INFRASTRUCTURE_ERROR");
     }
   });
+
+  it("maps repository VALIDATION_ERROR to app validation result", async () => {
+    const error = new Error("Validation failed") as Error & { code?: string; details?: unknown };
+    error.code = "VALIDATION_ERROR";
+    error.details = { name: ["name should not be empty"] };
+    mockRepository.create.mockRejectedValue(error);
+
+    const result = await service.create({
+      name: "Electronics",
+      description: "Devices",
+      status: "active",
+    });
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("VALIDATION_ERROR");
+      expect(result.error.field).toBe("name");
+    }
+  });
 });
