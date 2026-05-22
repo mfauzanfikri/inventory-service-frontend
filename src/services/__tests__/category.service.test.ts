@@ -57,6 +57,25 @@ describe("CategoryService", () => {
     }
   });
 
+  it("maps repository HTTP 404 error to NOT_FOUND result", async () => {
+    const error = new Error("Category not found") as Error & { status?: number; code?: string };
+    error.status = 404;
+    error.code = "NOT_FOUND";
+    mockRepository.create.mockRejectedValue(error);
+
+    const result = await service.create({
+      name: "Electronics",
+      description: "Devices",
+      status: "active",
+    });
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("NOT_FOUND");
+      expect(result.error.message).toContain("not found");
+    }
+  });
+
   it("returns success when deleting existing category", async () => {
     mockRepository.delete.mockResolvedValue({
       id: "target-id",
@@ -78,6 +97,19 @@ describe("CategoryService", () => {
     expect(result.ok).toBe(false);
     if(!result.ok) {
       expect(result.error.code).toBe("NOT_FOUND");
+    }
+  });
+
+  it("maps repository HTTP 503 error to INFRASTRUCTURE_ERROR", async () => {
+    const error = new Error("Service unavailable") as Error & { status?: number };
+    error.status = 503;
+    mockRepository.findAll.mockRejectedValue(error);
+
+    const result = await service.list();
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("INFRASTRUCTURE_ERROR");
     }
   });
 });

@@ -6,28 +6,38 @@ import { createMockCategoryRepository } from "@/repositories/category/category.m
 
 function mapCategoryError(error: unknown): AppError {
   const code = getErrorCode(error);
+  const status =
+    typeof error === "object" && error !== null && "status" in error
+      ? (error as { status?: unknown }).status
+      : undefined;
+  const message =
+    typeof error === "object" && error !== null && "message" in error
+      ? (error as { message?: unknown }).message
+      : undefined;
 
   if(
     code === "CATEGORY_NAME_CONFLICT" ||
-    (typeof error === "object" &&
-      error !== null &&
-      "status" in error &&
-      (error as { status?: number }).status === 409)
+    code === "CONFLICT" ||
+    status === 409
   ) {
     return {
       code: "CONFLICT",
-      message: "Category name already exists",
+      message: typeof message === "string" && message.length > 0 ? message : "Category name already exists",
       category: "domain",
       field: "name",
     };
   }
 
-  if(code === "CATEGORY_NOT_FOUND") {
+  if(code === "CATEGORY_NOT_FOUND" || code === "NOT_FOUND" || status === 404) {
     return {
       code: "NOT_FOUND",
-      message: "Category not found",
+      message: typeof message === "string" && message.length > 0 ? message : "Category not found",
       category: "domain",
     };
+  }
+
+  if(status === 500 || status === 502 || status === 503 || status === 504) {
+    return infrastructureError(typeof message === "string" && message.length > 0 ? message : undefined);
   }
 
   return unknownError();
