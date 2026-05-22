@@ -21,7 +21,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Controller, DefaultValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { createCategoryAction } from "../actions";
 
 const statusOptions = ["active", "inactive"] as const;
@@ -48,7 +47,6 @@ const defaultValues: DefaultValues<FormData> = {
 };
 
 export function AddCategoryModal() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const {
     register,
