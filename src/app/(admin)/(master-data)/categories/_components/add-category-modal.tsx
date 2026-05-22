@@ -38,11 +38,6 @@ type FormData = z.infer<typeof schema>;
 const defaultValues: DefaultValues<FormData> = {
   name: "",
   description: "",
-  /**
-   * Initialize as empty string to keep the Radix Select controlled from the start.
-   * This prevents the "changing from uncontrolled to controlled" warning.
-   * We cast to a valid status to satisfy the strict Zod enum type.
-   */
   status: "" as "active",
 };
 
@@ -54,30 +49,35 @@ export function AddCategoryModal() {
     formState: { errors, isSubmitting },
     control,
     reset,
+    setError,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues
   });
 
-  const onSubmit = async (
-    data: FormData,
-  ) => {
-    try {
-      const createdCategory = await createCategoryAction(data);
+  const onSubmit = async (data: FormData) => {
+    const result = await createCategoryAction(data);
 
-      const message = <span><b className="font-bold">{createdCategory.name}</b> category has been created</span>;
+    if(!result.ok) {
+      if(result.error.field === "name") {
+        setError("name", { message: result.error.message });
+        return;
+      }
 
-      toast.success(message, {
+      toast.error(result.error.message || "Failed to create category. Please try again.", {
         position: "top-center",
       });
-
-      reset(defaultValues);
-      setOpen(false);
-    } catch (error) {
-      toast.error("Failed to create category. Please try again.", {
-        position: "top-center",
-      });
+      return;
     }
+
+    const message = <span><b className="font-bold">{result.data.name}</b> category has been created</span>;
+
+    toast.success(message, {
+      position: "top-center",
+    });
+
+    reset(defaultValues);
+    setOpen(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -91,7 +91,7 @@ export function AddCategoryModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600">Add Category</Button>
+        <Button>Add Category</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>

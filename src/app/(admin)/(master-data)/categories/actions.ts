@@ -2,25 +2,33 @@
 
 import { categoryService } from "@/services/category.service";
 import { CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
+import { ActionResult } from "@/lib/result/action-result";
+import { Category } from "@/types/category";
 import { revalidatePath } from "next/cache";
 
-export async function createCategoryAction(data: CategoryCreateInput) {
-  // This runs on the server, so it modifies the server's memory
+export async function createCategoryAction(data: CategoryCreateInput): Promise<ActionResult<Category>> {
   const result = await categoryService.create(data);
-  
-  // Force Next.js to clear the cache and re-render the page
-  revalidatePath("/categories"); 
-  
+  if(result.ok) {
+    revalidatePath("/categories");
+  }
+
   return result;
 }
 
-export async function updateCategoryAction(id: string, data: CategoryUpdateInput) {
+export async function updateCategoryAction(id: string, data: CategoryUpdateInput): Promise<ActionResult<Category>> {
   const result = await categoryService.update(id, data);
-  revalidatePath("/categories");
+  if(result.ok) {
+    revalidatePath("/categories");
+  }
+
   return result;
 }
 
-export async function deleteCategoryAction(id: string) {
-  await categoryService.delete(id);
-  revalidatePath("/categories");
+export async function deleteCategoryAction(id: string): Promise<ActionResult<void>> {
+  const result = await categoryService.delete(id);
+  if(result.ok) {
+    revalidatePath("/categories");
+  }
+
+  return result;
 }

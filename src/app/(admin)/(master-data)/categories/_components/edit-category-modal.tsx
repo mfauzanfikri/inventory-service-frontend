@@ -58,6 +58,7 @@ export function EditCategoryModal({
     formState: { errors, dirtyFields, isSubmitting },
     control,
     reset,
+    setError,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -67,10 +68,6 @@ export function EditCategoryModal({
       reset({
         name: category.name,
         description: category.description,
-        /**
-         * Fallback to empty string to keep Select component controlled.
-         * This prevents React warnings when switching from undefined to a string value.
-         */
         status: category.status ?? ("" as "active"),
       });
     }
@@ -79,31 +76,39 @@ export function EditCategoryModal({
   if (!category) return null;
 
   const onSubmit = async (data: FormData) => {
-    try {
-      const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
-        const field = key as keyof FormData;
-        // Cast the value to the union of all possible FormData values to satisfy TS
-        acc[field] = data[field] as FormData[keyof FormData];
-        return acc;
-      }, {} as Partial<FormData>);
+    const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
+      const field = key as keyof FormData;
+      acc[field] = data[field] as FormData[keyof FormData];
+      return acc;
+    }, {} as Partial<FormData>);
 
-      if (Object.keys(changedFields).length > 0) {
-        await updateCategoryAction(category.id, changedFields);
+    if(Object.keys(changedFields).length === 0) {
+      onOpenChange(false);
+      return;
+    }
 
-        toast.success(
-          <span>
-            <b className="font-bold">{data.name}</b> category has been updated
-          </span>,
-          { position: "top-center" }
-        );
+    const result = await updateCategoryAction(category.id, changedFields);
+
+    if(!result.ok) {
+      if(result.error.field === "name") {
+        setError("name", { message: result.error.message });
+        return;
       }
 
-      onOpenChange(false);
-    } catch (error) {
-      toast.error("Failed to update category. Please try again.", {
+      toast.error(result.error.message || "Failed to update category. Please try again.", {
         position: "top-center",
       });
+      return;
     }
+
+    toast.success(
+      <span>
+        <b className="font-bold">{data.name}</b> category has been updated
+      </span>,
+      { position: "top-center" }
+    );
+
+    onOpenChange(false);
   };
 
   return (

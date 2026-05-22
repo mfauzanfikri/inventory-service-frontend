@@ -34,7 +34,14 @@ export function DeleteCategoryModal(
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteCategoryAction(category.id);
+      const result = await deleteCategoryAction(category.id);
+
+      if(!result.ok) {
+        toast.error(result.error.message || "Failed to delete category. Please try again.", {
+          position: "top-center",
+        });
+        return;
+      }
 
       const message = (
         <span>
@@ -48,10 +55,6 @@ export function DeleteCategoryModal(
       });
 
       onOpenChange(false);
-    } catch (error) {
-      toast.error("Failed to delete category. Please try again.", {
-        position: "top-center",
-      });
     } finally {
       setIsDeleting(false);
     }

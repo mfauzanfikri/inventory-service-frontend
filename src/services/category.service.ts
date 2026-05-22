@@ -1,122 +1,128 @@
-import { createMockCategoryRepository } from "@/repositories/category/category.mock.repository";
-import type { CategoryRepository } from "@/repositories/category/category.repository";
+import { CategoryDomainRepository, CategoryEntity, CategoryName, CategoryDescription } from "@/domain/category";
+import { AppError, getErrorCode, infrastructureError, unknownError } from "@/lib/errors/app-error";
+import { Result, failure, success } from "@/lib/result";
 import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
+import { createMockCategoryRepository } from "@/repositories/category/category.mock.repository";
 
-export class CategoryNotFoundError extends Error {
-  readonly code = "CATEGORY_NOT_FOUND";
+function mapCategoryError(error: unknown): AppError {
+  const code = getErrorCode(error);
 
-  constructor(message: string) {
-    super(message);
-    this.name = "CategoryNotFoundError";
+  if(
+    code === "CATEGORY_NAME_CONFLICT" ||
+    (typeof error === "object" &&
+      error !== null &&
+      "status" in error &&
+      (error as { status?: number }).status === 409)
+  ) {
+    return {
+      code: "CONFLICT",
+      message: "Category name already exists",
+      category: "domain",
+      field: "name",
+    };
   }
+
+  if(code === "CATEGORY_NOT_FOUND") {
+    return {
+      code: "NOT_FOUND",
+      message: "Category not found",
+      category: "domain",
+    };
+  }
+
+  return unknownError();
 }
 
-export class CategoryConflictError extends Error {
-  readonly code = "CATEGORY_NAME_CONFLICT";
+export type CategoryResult<T> = Result<T, AppError>;
 
-  constructor(message = "Category name already exists") {
-    super(message);
-    this.name = "CategoryConflictError";
-  }
-}
-
-export class CategoryInfrastructureError extends Error {
-  readonly code = "CATEGORY_INFRASTRUCTURE_ERROR";
-
-  constructor(message = "Category service is unavailable") {
-    super(message);
-    this.name = "CategoryInfrastructureError";
-  }
-}
-
-function extractStatus(error: unknown): number | undefined {
-  if(typeof error === "object" && error !== null && "status" in error) {
-    const status = (error as { status?: unknown }).status;
-    if(typeof status === "number") {
-      return status;
-    }
-  }
-
-  return undefined;
-}
-
-function mapRepositoryError(error: unknown): never {
-  const status = extractStatus(error);
-  if(status === 409) {
-    throw new CategoryConflictError();
-  }
-
-  if(error instanceof CategoryConflictError || error instanceof CategoryNotFoundError || error instanceof CategoryInfrastructureError) {
-    throw error;
-  }
-
-  throw new CategoryInfrastructureError();
-}
-
-export function createCategoryService(
-  repository: CategoryRepository = createMockCategoryRepository()
-) {
+export function createCategoryService(repository: CategoryDomainRepository = createMockCategoryRepository()) {
   return {
-    async getAll() {
+    async list(): Promise<CategoryResult<Category[]>> {
       try {
-        return await repository.findAll();
-      } catch(error: unknown) {
-        mapRepositoryError(error);
+        const categories = await repository.findAll();
+        const validated = categories.map((category) => CategoryEntity.create(category).toJSON());
+        return success(validated);
+      } catch (error: unknown) {
+        return failure(mapCategoryError(error));
       }
     },
-    async getByName(name: string): Promise<Category> {
+
+    async create(data: CategoryCreateInput): Promise<CategoryResult<Category>> {
+      try {
+        const payload: CategoryCreateInput = {
+          name: CategoryName.create(data.name).toString(),
+          description: CategoryDescription.create(data.description).toString(),
+          status: data.status,
+        };
+
+        const category = await repository.create(payload);
+        return success(CategoryEntity.create(category).toJSON());
+      } catch (error: unknown) {
+        return failure(mapCategoryError(error));
+      }
+    },
+
+    async update(id: string, data: CategoryUpdateInput): Promise<CategoryResult<Category>> {
+      try {
+        const payload: CategoryUpdateInput = { ...data };
+
+        if(payload.name !== undefined) {
+          payload.name = CategoryName.create(payload.name).toString();
+        }
+
+        if(payload.description !== undefined) {
+          payload.description = CategoryDescription.create(payload.description).toString();
+        }
+
+        const updated = await repository.update(id, payload);
+        if(!updated) {
+          return failure({
+            code: "NOT_FOUND",
+            message: "Category not found",
+            category: "application",
+          });
+        }
+
+        return success(CategoryEntity.create(updated).toJSON());
+      } catch (error: unknown) {
+        return failure(mapCategoryError(error));
+      }
+    },
+
+    async delete(id: string): Promise<CategoryResult<void>> {
+      try {
+        const deleted = await repository.delete(id);
+        if(!deleted) {
+          return failure({
+            code: "NOT_FOUND",
+            message: "Category not found",
+            category: "application",
+          });
+        }
+
+        return success(undefined);
+      } catch (error: unknown) {
+        return failure(mapCategoryError(error));
+      }
+    },
+
+    async getByName(name: string): Promise<CategoryResult<Category>> {
       try {
         const category = await repository.findByName(name);
         if(!category) {
-          throw new CategoryNotFoundError(`Category with name ${name} not found`);
+          return failure({
+            code: "NOT_FOUND",
+            message: `Category with name ${name} not found`,
+            category: "application",
+            field: "name",
+          });
         }
 
-        return category;
-      } catch(error: unknown) {
-        if(error instanceof CategoryNotFoundError) {
-          throw error;
-        }
-
-        mapRepositoryError(error);
+        return success(CategoryEntity.create(category).toJSON());
+      } catch {
+        return failure(infrastructureError());
       }
     },
-    async create(data: CategoryCreateInput) {
-      try {
-        return await repository.create(data);
-      } catch(error: unknown) {
-        mapRepositoryError(error);
-      }
-    },
-    async update(id: string, data: CategoryUpdateInput): Promise<Category> {
-      try {
-        const category = await repository.update(id, data);
-        if(!category) {
-          throw new CategoryNotFoundError(`Category with id ${id} not found`);
-        }
-
-        return category;
-      } catch(error: unknown) {
-        if(error instanceof CategoryNotFoundError) {
-          throw error;
-        }
-
-        mapRepositoryError(error);
-      }
-    },
-    async delete(id: string): Promise<void> {
-      try {
-        const category = await repository.delete(id);
-        if(!category) {
-          throw new CategoryNotFoundError(`Category with id ${id} not found`);
-        }
-      } catch(error: unknown) {
-        if(error instanceof CategoryNotFoundError) {
-          throw error;
-        }
-
-        mapRepositoryError(error);
-      }
-    }
   };
 }
 

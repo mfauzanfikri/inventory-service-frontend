@@ -17,16 +17,14 @@ export function CategoryActions({
   return (
     <div className="flex justify-center gap-1">
       <Button
-        type="button"
-        className="bg-yellow-500 hover:bg-yellow-600"
+        variant="outline"
         onClick={() => onEdit(category)}
       >
         Edit
       </Button>
 
       <Button
-        type="button"
-        className="bg-red-600 hover:bg-red-700"
+        variant="destructive"
         onClick={() => onDelete(category)}
       >
         Delete

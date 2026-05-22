@@ -1,11 +1,6 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Metadata } from "next";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { categoryService } from "@/services/category.service";
 import { CategoryTable } from "./_components/category-table";
 
@@ -14,7 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const data = await categoryService.getAll();
+  const result = await categoryService.list();
+  const data = result.ok ? result.data : [];
 
   return (
     <div>
