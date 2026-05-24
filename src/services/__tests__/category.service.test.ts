@@ -28,6 +28,22 @@ describe("CategoryService", () => {
     }
   });
 
+  it("creates category successfully", async () => {
+    const mockData = { id: "1", name: "Electronics", description: "Devices", status: "active" as const };
+    mockRepository.create.mockResolvedValue(mockData);
+
+    const result = await service.create({
+      name: "Electronics",
+      description: "Devices",
+      status: "active",
+    });
+
+    expect(result.ok).toBe(true);
+    if(result.ok) {
+      expect(result.data).toEqual(mockData);
+    }
+  });
+
   it("returns conflict result for duplicate create", async () => {
     const conflict = new Error("duplicate");
     (conflict as Error & { status?: number }).status = 409;
@@ -43,6 +59,22 @@ describe("CategoryService", () => {
     if(!result.ok) {
       expect(result.error.code).toBe("CONFLICT");
       expect(result.error.field).toBe("name");
+    }
+  });
+
+  it("updates category successfully", async () => {
+    const mockData = { id: "1", name: "Electronics", description: "Devices", status: "inactive" as const };
+    mockRepository.update.mockResolvedValue(mockData);
+
+    const result = await service.update("1", {
+      name: "Electronics",
+      description: "Devices",
+      status: "inactive",
+    });
+
+    expect(result.ok).toBe(true);
+    if(result.ok) {
+      expect(result.data).toEqual(mockData);
     }
   });
 
@@ -100,6 +132,19 @@ describe("CategoryService", () => {
     }
   });
 
+  it("returns infrastructure error when delete fails", async () => {
+    const error = new Error("Connection failed") as Error & { status?: number };
+    error.status = 500;
+    mockRepository.delete.mockRejectedValue(error);
+
+    const result = await service.delete("target-id");
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("INFRASTRUCTURE_ERROR");
+    }
+  });
+
   it("maps repository HTTP 503 error to INFRASTRUCTURE_ERROR", async () => {
     const error = new Error("Service unavailable") as Error & { status?: number };
     error.status = 503;
@@ -129,6 +174,60 @@ describe("CategoryService", () => {
     if(!result.ok) {
       expect(result.error.code).toBe("VALIDATION_ERROR");
       expect(result.error.field).toBe("name");
+    }
+  });
+
+  it("maps repository VALIDATION_ERROR with null details correctly", async () => {
+    const error = new Error("Validation failed") as Error & { code?: string; details?: unknown };
+    error.code = "VALIDATION_ERROR";
+    error.details = null;
+    mockRepository.create.mockRejectedValue(error);
+
+    const result = await service.create({
+      name: "Electronics",
+      description: "Devices",
+      status: "active",
+    });
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("VALIDATION_ERROR");
+      expect(result.error.field).toBeUndefined();
+    }
+  });
+
+  it("gets category by name successfully", async () => {
+    const mockData = { id: "1", name: "Electronics", description: "Devices", status: "active" as const };
+    mockRepository.findByName.mockResolvedValue(mockData);
+
+    const result = await service.getByName("Electronics");
+
+    expect(result.ok).toBe(true);
+    if(result.ok) {
+      expect(result.data).toEqual(mockData);
+    }
+  });
+
+  it("returns not found for getByName when category missing", async () => {
+    mockRepository.findByName.mockResolvedValue(null);
+
+    const result = await service.getByName("Missing");
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("NOT_FOUND");
+    }
+  });
+
+  it("maps generic error to unknownError inside mapCategoryError", async () => {
+    const error = "some random string error";
+    mockRepository.findAll.mockRejectedValue(error);
+
+    const result = await service.list();
+
+    expect(result.ok).toBe(false);
+    if(!result.ok) {
+      expect(result.error.code).toBe("UNKNOWN_ERROR");
     }
   });
 });
