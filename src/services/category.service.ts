@@ -1,8 +1,8 @@
-import { CategoryDomainRepository, CategoryEntity, CategoryName, CategoryDescription } from "@/domain/category";
+import { CategoryDescription, CategoryDomainRepository, CategoryEntity, CategoryName } from "@/domain/category";
 import { AppError, getErrorCode, infrastructureError, unknownError } from "@/lib/errors/app-error";
-import { Result, failure, success } from "@/lib/result";
+import { failure, Result, success } from "@/lib/result";
 import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
-import { createMockCategoryRepository } from "@/repositories/category/category.mock.repository";
+import { createApiCategoryRepository } from "@/infrastructure/category/category.api.repository";
 
 function mapCategoryError(error: unknown): AppError {
   const code = getErrorCode(error);
@@ -69,7 +69,7 @@ function mapCategoryError(error: unknown): AppError {
 
 export type CategoryResult<T> = Result<T, AppError>;
 
-export function createCategoryService(repository: CategoryDomainRepository = createMockCategoryRepository()) {
+export function createCategoryService(repository: CategoryDomainRepository) {
   return {
     async list(): Promise<CategoryResult<Category[]>> {
       try {
@@ -160,4 +160,6 @@ export function createCategoryService(repository: CategoryDomainRepository = cre
   };
 }
 
-export const categoryService = createCategoryService();
+// To switch drivers manually, toggle between createApiCategoryRepository and createInMemoryCategoryRepository here:
+export const categoryService = createCategoryService(createApiCategoryRepository());
+// export const categoryService = createCategoryService(createInMemoryCategoryRepository());
