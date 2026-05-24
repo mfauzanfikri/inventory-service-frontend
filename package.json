@@ -1,5 +1,5 @@
 {
-  "name": "inventory-service-frontend",
+  "name": "inventory-service-web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
