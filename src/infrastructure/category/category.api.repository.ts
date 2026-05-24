@@ -118,7 +118,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   );
 }
 
-export function createHttpCategoryRepository(): CategoryDomainRepository {
+export function createApiCategoryRepository(): CategoryDomainRepository {
   return {
     async findAll(): Promise<Category[]> {
       return request<Category[]>("/categories");

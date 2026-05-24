@@ -1,6 +1,6 @@
-import { createHttpCategoryRepository } from "./category.http.repository";
+import { createApiCategoryRepository } from "./category.api.repository";
 
-describe("createHttpCategoryRepository", () => {
+describe("createApiCategoryRepository", () => {
   const originalFetch = global.fetch;
 
   afterEach(() => {
@@ -19,7 +19,7 @@ describe("createHttpCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createHttpCategoryRepository();
+    const repository = createApiCategoryRepository();
     const data = await repository.findAll();
 
     expect(data).toHaveLength(1);
@@ -40,7 +40,7 @@ describe("createHttpCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createHttpCategoryRepository();
+    const repository = createApiCategoryRepository();
 
     await expect(
       repository.create({
@@ -56,4 +56,3 @@ describe("createHttpCategoryRepository", () => {
     });
   });
 });
-
