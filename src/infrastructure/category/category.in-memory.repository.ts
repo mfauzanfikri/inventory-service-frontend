@@ -59,6 +59,8 @@ let categories: Category[] = globalForCategories.mockCategories || [
   name,
   description,
   status: index % 5 === 0 ? "inactive" : "active",
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 }));
 
 if(process.env.NODE_ENV !== "production") {
@@ -88,6 +90,8 @@ async function create(data: CategoryCreateInput): Promise<Category> {
   const newCategory: Category = {
     id: `category-${String(categories.length + 1).padStart(2, "0")}`,
     ...data,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   categories.push(newCategory);
@@ -104,7 +108,11 @@ async function update(id: string, data: CategoryUpdateInput): Promise<Category |
     throw createConflictError(`Category with name ${data.name} already exists`);
   }
 
-  categories[index] = { ...categories[index], ...data };
+  categories[index] = {
+    ...categories[index],
+    ...data,
+    updatedAt: new Date().toISOString(),
+  };
   return categories[index];
 }
 

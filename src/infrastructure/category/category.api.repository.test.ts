@@ -35,7 +35,14 @@ describe("createApiCategoryRepository", () => {
     const repository = createApiCategoryRepository();
     const data = await repository.delete("1");
 
-    expect(data).toEqual({ id: "1", name: "", description: "", status: "active" });
+    expect(data).toEqual({
+      id: "1",
+      name: "",
+      description: "",
+      status: "active",
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+    });
   });
 
   it("falls back to raw payload if response is not standard envelope-based", async () => {

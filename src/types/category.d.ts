@@ -3,8 +3,10 @@ export type Category = {
   name: string
   description: string
   status: "active" | "inactive"
+  createdAt: string
+  updatedAt: string
 }
 
-export type CategoryCreateInput = Omit<Category, "id">
+export type CategoryCreateInput = Omit<Category, "id" | "createdAt" | "updatedAt">
 
 export type CategoryUpdateInput = Partial<CategoryCreateInput>

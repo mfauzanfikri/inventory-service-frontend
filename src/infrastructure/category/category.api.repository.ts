@@ -164,7 +164,14 @@ export function createApiCategoryRepository(): CategoryDomainRepository {
           method: "DELETE",
         });
 
-        return { id, name: "", description: "", status: "active" };
+        return {
+          id,
+          name: "",
+          description: "",
+          status: "active",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
       } catch(error: unknown) {
         if(typeof error === "object" && error !== null && "status" in error && (error as { status?: number }).status === 404) {
           return null;

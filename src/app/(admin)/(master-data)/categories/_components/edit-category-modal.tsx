@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Category } from "@/types/category";
+import { Category, CategoryUpdateInput } from "@/types/category";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -76,11 +76,10 @@ export function EditCategoryModal({
   if (!category) return null;
 
   const onSubmit = async (data: FormData) => {
-    const changedFields = Object.keys(dirtyFields).reduce((acc, key) => {
-      const field = key as keyof FormData;
-      acc[field] = data[field] as FormData[keyof FormData];
-      return acc;
-    }, {} as Partial<FormData>);
+    const changedFields: CategoryUpdateInput = {};
+    if (dirtyFields.name) changedFields.name = data.name;
+    if (dirtyFields.description) changedFields.description = data.description;
+    if (dirtyFields.status) changedFields.status = data.status;
 
     if(Object.keys(changedFields).length === 0) {
       onOpenChange(false);

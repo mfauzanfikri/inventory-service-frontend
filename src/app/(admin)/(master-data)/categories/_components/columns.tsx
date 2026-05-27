@@ -54,6 +54,34 @@ export function getColumns(
       ),
     },
     {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() =>
+            column.toggleSorting(
+              column.getIsSorted() === "asc"
+            )
+          }
+        >
+          Created At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ getValue }) => {
+        const value = getValue<string>();
+        if (!value) return "-";
+        const date = new Date(value);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        const hh = String(date.getHours()).padStart(2, "0");
+        const min = String(date.getMinutes()).padStart(2, "0");
+        const ss = String(date.getSeconds()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+      },
+    },
+    {
       accessorKey: "status",
       header: ({ column }) => (
         <div className="text-center">

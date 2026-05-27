@@ -10,8 +10,8 @@ describe("Category domain", () => {
       name: "Electronics",
       description: "Devices",
       status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
 
     expect(entity.toJSON().name).toBe("Electronics");
@@ -24,6 +24,8 @@ describe("Category domain", () => {
         name: "Electronics",
         description: "Devices",
         status: "pending" as any,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
     ).toThrow("Category status is invalid");
   });
