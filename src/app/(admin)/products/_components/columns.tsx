@@ -1,20 +1,25 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Edit, Sliders, Trash } from "lucide-react";
+import { ArrowUpDown, Edit, Sliders, Ban, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 interface GetColumnsProps {
   onEdit: (product: Product) => void;
   onAdjustStock: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onDeactivate: (product: Product) => void;
+  onActivate: (product: Product) => void;
+  togglingId: string | null;
 }
 
 export function getColumns({
   onEdit,
   onAdjustStock,
-  onDelete,
+  onDeactivate,
+  onActivate,
+  togglingId,
 }: GetColumnsProps): ColumnDef<Product>[] {
   return [
     {
@@ -112,6 +117,7 @@ export function getColumns({
               className="h-8 w-8 text-blue-600 hover:text-blue-700"
               onClick={() => onAdjustStock(product)}
               title="Adjust Stock"
+              disabled={togglingId === product.id}
             >
               <Sliders className="h-4 w-4" />
             </Button>
@@ -121,18 +127,40 @@ export function getColumns({
               className="h-8 w-8 text-amber-600 hover:text-amber-700"
               onClick={() => onEdit(product)}
               title="Edit Product"
+              disabled={togglingId === product.id}
             >
               <Edit className="h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 text-red-600 hover:text-red-700"
-              onClick={() => onDelete(product)}
-              title="Delete Product"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
+            {togglingId === product.id ? (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                disabled
+              >
+                <Spinner className="h-4 w-4" />
+              </Button>
+            ) : product.status === "active" ? (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 text-red-600 hover:text-red-700"
+                onClick={() => onDeactivate(product)}
+                title="Deactivate Product"
+              >
+                <Ban className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 text-green-600 hover:text-green-700"
+                onClick={() => onActivate(product)}
+                title="Activate Product"
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         );
       },

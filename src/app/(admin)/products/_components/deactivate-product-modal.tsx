@@ -5,27 +5,27 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Product } from "@/types/product";
-import { deleteProductAction } from "../actions";
+import { updateProductAction } from "../actions";
 import { toast } from "sonner";
 
-interface DeleteProductModalProps {
+interface DeactivateProductModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: Product | null;
 }
 
-export function DeleteProductModal({ open, onOpenChange, product }: DeleteProductModalProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+export function DeactivateProductModal({ open, onOpenChange, product }: DeactivateProductModalProps) {
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
   if (!product) return null;
 
-  const handleDelete = async () => {
+  const handleDeactivate = async () => {
     try {
-      setIsDeleting(true);
-      const result = await deleteProductAction(product.id);
+      setIsDeactivating(true);
+      const result = await updateProductAction(product.id, { status: "inactive" });
 
       if (!result.ok) {
-        toast.error(result.error.message || "Failed to delete product. Please try again.", {
+        toast.error(result.error.message || "Failed to deactivate product. Please try again.", {
           position: "top-center",
         });
         return;
@@ -33,14 +33,14 @@ export function DeleteProductModal({ open, onOpenChange, product }: DeleteProduc
 
       toast.success(
         <span>
-          Product <b className="font-bold">{product.name}</b> has been deleted successfully
+          Product <b className="font-bold">{product.name}</b> has been deactivated successfully
         </span>,
         { position: "top-center" }
       );
 
       onOpenChange(false);
     } finally {
-      setIsDeleting(false);
+      setIsDeactivating(false);
     }
   };
 
@@ -48,10 +48,10 @@ export function DeleteProductModal({ open, onOpenChange, product }: DeleteProduc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Product</DialogTitle>
+          <DialogTitle>Deactivate Product</DialogTitle>
           <DialogDescription>
-            Are you sure you want to permanently delete <strong>{product.name}</strong> (SKU: {product.sku})? 
-            This action cannot be undone.
+            Are you sure you want to deactivate <strong>{product.name}</strong> (SKU: {product.sku})? 
+            This will soft-deactivate the product but preserve its stock history.
           </DialogDescription>
         </DialogHeader>
 
@@ -60,7 +60,7 @@ export function DeleteProductModal({ open, onOpenChange, product }: DeleteProduc
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
+            disabled={isDeactivating}
           >
             Cancel
           </Button>
@@ -68,15 +68,15 @@ export function DeleteProductModal({ open, onOpenChange, product }: DeleteProduc
           <Button
             type="button"
             variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
+            onClick={handleDeactivate}
+            disabled={isDeactivating}
           >
-            {isDeleting ? (
+            {isDeactivating ? (
               <>
-                <Spinner /> Delete
+                <Spinner /> Deactivate
               </>
             ) : (
-              "Delete"
+              "Deactivate"
             )}
           </Button>
         </DialogFooter>

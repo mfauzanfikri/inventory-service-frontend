@@ -39,15 +39,6 @@ export async function adjustStockAction(
   return result;
 }
 
-export async function deleteProductAction(id: string): Promise<ActionResult<void>> {
-  const result = await productService.delete(id);
-  if (result.ok) {
-    revalidatePath("/products");
-    revalidatePath("/"); // Keep dashboard statistics in sync
-  }
-
-  return result;
-}
 
 export async function getProductsAction(): Promise<ActionResult<Product[]>> {
   return productService.list();

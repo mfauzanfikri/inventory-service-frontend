@@ -7,8 +7,10 @@ import { Category } from "@/types/category";
 import { AddProductModal } from "./add-product-modal";
 import { EditProductModal } from "./edit-product-modal";
 import { AdjustStockModal } from "./adjust-stock-modal";
-import { DeleteProductModal } from "./delete-product-modal";
+import { DeactivateProductModal } from "./deactivate-product-modal";
 import { getColumns } from "./columns";
+import { updateProductAction } from "../actions";
+import { toast } from "sonner";
 
 interface ProductTableProps {
   products: Product[];
@@ -20,7 +22,8 @@ export function ProductTable({ products, categories }: ProductTableProps) {
 
   const [editOpen, setEditOpen] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const columns = getColumns({
     onEdit: (product) => {
@@ -31,10 +34,31 @@ export function ProductTable({ products, categories }: ProductTableProps) {
       setSelectedProduct(product);
       setAdjustOpen(true);
     },
-    onDelete: (product) => {
+    onDeactivate: (product) => {
       setSelectedProduct(product);
-      setDeleteOpen(true);
+      setDeactivateOpen(true);
     },
+    onActivate: async (product) => {
+      try {
+        setTogglingId(product.id);
+        const result = await updateProductAction(product.id, { status: "active" });
+        if (!result.ok) {
+          toast.error(result.error.message || "Failed to activate product. Please try again.", {
+            position: "top-center",
+          });
+          return;
+        }
+        toast.success(
+          <span>
+            Product <b className="font-bold">{product.name}</b> has been activated successfully
+          </span>,
+          { position: "top-center" }
+        );
+      } finally {
+        setTogglingId(null);
+      }
+    },
+    togglingId,
   });
 
   return (
@@ -58,9 +82,9 @@ export function ProductTable({ products, categories }: ProductTableProps) {
         product={selectedProduct}
       />
 
-      <DeleteProductModal
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
+      <DeactivateProductModal
+        open={deactivateOpen}
+        onOpenChange={setDeactivateOpen}
         product={selectedProduct}
       />
     </>
