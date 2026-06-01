@@ -34,8 +34,10 @@ describe("Category domain", () => {
     expect(() => CategoryName.create("ab")).toThrow("at least 3");
   });
 
-  it("validates category description", () => {
-    expect(() => CategoryDescription.create(" ")).toThrow("required");
+  it("normalizes empty or missing category description to empty string", () => {
+    expect(CategoryDescription.create(" ").toString()).toBe("");
+    expect(CategoryDescription.create(undefined).toString()).toBe("");
+    expect(CategoryDescription.create("").toString()).toBe("");
   });
 
   it("covers custom error constructors", () => {

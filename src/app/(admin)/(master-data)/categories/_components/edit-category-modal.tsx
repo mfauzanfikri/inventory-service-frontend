@@ -33,7 +33,7 @@ const statusOptions = ["active", "inactive"] as const;
 
 const schema = z.object({
   name: z.string().min(3, "Name too short"),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().optional(),
   status: z.enum(statusOptions, {
     error: "Please select a valid status",
   }),
@@ -78,7 +78,7 @@ export function EditCategoryModal({
   const onSubmit = async (data: FormData) => {
     const changedFields: CategoryUpdateInput = {};
     if (dirtyFields.name) changedFields.name = data.name;
-    if (dirtyFields.description) changedFields.description = data.description;
+    if (dirtyFields.description) changedFields.description = data.description || "";
     if (dirtyFields.status) changedFields.status = data.status;
 
     if(Object.keys(changedFields).length === 0) {
@@ -134,7 +134,7 @@ export function EditCategoryModal({
 
             <Field data-invalid={!!errors.description}>
               <FieldLabel htmlFor="edit-category-description">
-                Description
+                Description <span className="text-muted-foreground text-xs font-normal font-sans ml-1">(Optional)</span>
               </FieldLabel>
               <Textarea
                 id="edit-category-description"

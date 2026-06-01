@@ -23,14 +23,9 @@ import { Controller, DefaultValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createCategoryAction } from "../actions";
 
-const statusOptions = ["active", "inactive"] as const;
-
 const schema = z.object({
   name: z.string().min(3, "Name too short"),
-  description: z.string().min(1, "Description is required"),
-  status: z.enum(statusOptions, {
-    error: "Please select a valid status",
-  }),
+  description: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -38,7 +33,6 @@ type FormData = z.infer<typeof schema>;
 const defaultValues: DefaultValues<FormData> = {
   name: "",
   description: "",
-  status: "" as "active",
 };
 
 export function AddCategoryModal() {
@@ -56,7 +50,11 @@ export function AddCategoryModal() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const result = await createCategoryAction(data);
+    const result = await createCategoryAction({
+      name: data.name,
+      description: data.description || "",
+      status: "active",
+    });
 
     if(!result.ok) {
       if(result.error.field === "name") {
@@ -115,7 +113,9 @@ export function AddCategoryModal() {
             </Field>
 
             <Field data-invalid={!!errors.description}>
-              <FieldLabel htmlFor="category-description">Description</FieldLabel>
+              <FieldLabel htmlFor="category-description">
+                Description <span className="text-muted-foreground text-xs font-normal font-sans ml-1">(Optional)</span>
+              </FieldLabel>
               <Textarea
                 id="category-description"
                 {...register("description")}
@@ -125,36 +125,6 @@ export function AddCategoryModal() {
                 <FieldError>{errors.description.message}</FieldError>
               )}
             </Field>
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="status">Status</FieldLabel>
-
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger
-                      id="status"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
-                </Field>
-              )}
-            />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>

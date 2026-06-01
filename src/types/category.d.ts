@@ -7,6 +7,8 @@ export type Category = {
   updatedAt: string
 }
 
-export type CategoryCreateInput = Omit<Category, "id" | "createdAt" | "updatedAt">
+export type CategoryCreateInput = Omit<Category, "id" | "createdAt" | "updatedAt"> & {
+  description?: string
+}
 
 export type CategoryUpdateInput = Partial<CategoryCreateInput>

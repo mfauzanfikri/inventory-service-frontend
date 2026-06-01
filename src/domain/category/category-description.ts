@@ -1,13 +1,8 @@
 export class CategoryDescription {
   private constructor(private readonly value: string) {}
 
-  static create(raw: string): CategoryDescription {
-    const value = raw.trim();
-
-    if(value.length === 0) {
-      throw new Error("Category description is required");
-    }
-
+  static create(raw?: string): CategoryDescription {
+    const value = (raw ?? "").trim();
     return new CategoryDescription(value);
   }
 
