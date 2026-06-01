@@ -52,6 +52,7 @@ import ChatIcon from "./chat.svg";
 import MoreDotIcon from "./more-dot.svg";
 import BellIcon from "./bell.svg";
 import BoxClosed from "./box-closed.svg";
+import BoxArchive from "./box-archive.svg";
 
 export {
   DownloadIcon,
@@ -107,5 +108,6 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
-  BoxClosed
+  BoxClosed,
+  BoxArchive,
 };
