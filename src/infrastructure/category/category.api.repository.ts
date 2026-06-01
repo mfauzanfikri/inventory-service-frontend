@@ -41,28 +41,5 @@ export function createApiCategoryRepository(): CategoryDomainRepository {
         throw error;
       }
     },
-
-    async delete(id: string): Promise<Category | null> {
-      try {
-        await request<void>(`/categories/${id}`, {
-          method: "DELETE",
-        });
-
-        return {
-          id,
-          name: "",
-          description: "",
-          status: "active",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-      } catch(error: unknown) {
-        if(typeof error === "object" && error !== null && "status" in error && (error as { status?: number }).status === 404) {
-          return null;
-        }
-
-        throw error;
-      }
-    },
   };
 }

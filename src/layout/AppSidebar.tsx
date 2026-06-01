@@ -197,16 +197,18 @@ const AppSidebar: React.FC = () => {
   useEffect(() => {
     // Check if the current path matches any submenu item
     let submenuMatched = false;
+    let targetSubmenu: typeof openSubmenu = null;
+
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
         if(nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if(isActive(subItem.path)) {
-              setOpenSubmenu({
+              targetSubmenu = {
                 type: menuType as "main" | "others",
                 index,
-              });
+              };
               submenuMatched = true;
             }
           });
@@ -214,11 +216,19 @@ const AppSidebar: React.FC = () => {
       });
     });
 
-    // If no submenu item matches, close the open submenu
-    if(!submenuMatched) {
-      setOpenSubmenu(null);
-    }
-  }, [pathname, isActive]);
+    setTimeout(() => {
+      if (submenuMatched) {
+        if (
+          openSubmenu?.type !== targetSubmenu?.type ||
+          openSubmenu?.index !== targetSubmenu?.index
+        ) {
+          setOpenSubmenu(targetSubmenu);
+        }
+      } else if (openSubmenu !== null) {
+        setOpenSubmenu(null);
+      }
+    }, 0);
+  }, [pathname, isActive, openSubmenu]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened

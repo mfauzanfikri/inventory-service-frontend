@@ -50,23 +50,7 @@ export function createApiProductRepository(): ProductDomainRepository {
       }
     },
 
-    async delete(id: string): Promise<Product | null> {
-      try {
-        return await request<Product>(`/products/${id}`, {
-          method: "DELETE",
-        });
-      } catch (error: unknown) {
-        if (
-          typeof error === "object" &&
-          error !== null &&
-          "status" in error &&
-          (error as { status?: number }).status === 404
-        ) {
-          return null;
-        }
-        throw error;
-      }
-    },
+
 
     async adjustStock(
       id: string,

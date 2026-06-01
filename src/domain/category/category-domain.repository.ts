@@ -5,5 +5,4 @@ export type CategoryDomainRepository = {
   findByName(name: string): Promise<Category | null>;
   create(data: CategoryCreateInput): Promise<Category>;
   update(id: string, data: CategoryUpdateInput): Promise<Category | null>;
-  delete(id: string): Promise<Category | null>;
 };

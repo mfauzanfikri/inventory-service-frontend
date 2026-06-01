@@ -7,7 +7,6 @@ describe("ProductService", () => {
     getById: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
     adjustStock: jest.fn(),
   };
 
@@ -134,13 +133,7 @@ describe("ProductService", () => {
     }
   });
 
-  it("deletes product successfully", async () => {
-    mockRepository.delete.mockResolvedValue(mockProduct);
 
-    const result = await service.delete("prod-1");
-
-    expect(result.ok).toBe(true);
-  });
 
   it("adjusts stock successfully for increments", async () => {
     const incrementedProduct = {

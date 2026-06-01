@@ -116,22 +116,11 @@ async function update(id: string, data: CategoryUpdateInput): Promise<Category |
   return categories[index];
 }
 
-async function deleteCategory(id: string): Promise<Category | null> {
-  const index = categories.findIndex((category) => category.id === id);
-  if(index === -1) {
-    return null;
-  }
-
-  const [deletedCategory] = categories.splice(index, 1);
-  return deletedCategory;
-}
-
 export function createInMemoryCategoryRepository(): CategoryDomainRepository {
   return {
     findAll,
     findByName,
     create,
     update,
-    delete: deleteCategory,
   };
 }

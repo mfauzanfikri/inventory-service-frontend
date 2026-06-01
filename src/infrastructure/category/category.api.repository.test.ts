@@ -26,25 +26,6 @@ describe("createApiCategoryRepository", () => {
     expect(data[0].name).toBe("Electronics");
   });
 
-  it("parses HTTP 204 No Content response as undefined", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 204,
-    }) as unknown as typeof fetch;
-
-    const repository = createApiCategoryRepository();
-    const data = await repository.delete("1");
-
-    expect(data).toEqual({
-      id: "1",
-      name: "",
-      description: "",
-      status: "active",
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
-    });
-  });
-
   it("falls back to raw payload if response is not standard envelope-based", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
@@ -143,25 +124,7 @@ describe("createApiCategoryRepository", () => {
     expect(result).toBeNull();
   });
 
-  it("swallows HTTP 404 and returns null for delete", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-      statusText: "Not Found",
-      json: async () => ({
-        success: false,
-        code: "NOT_FOUND",
-        message: "Category not found",
-      }),
-    }) as unknown as typeof fetch;
-
-    const repository = createApiCategoryRepository();
-    const result = await repository.delete("missing-id");
-
-    expect(result).toBeNull();
-  });
-
-  it("rethrows non-404 errors in findByName, update, and delete", async () => {
+  it("rethrows non-404 errors in findByName and update", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 500,
@@ -176,7 +139,6 @@ describe("createApiCategoryRepository", () => {
 
     await expect(repository.findByName("ErrorName")).rejects.toMatchObject({ status: 500 });
     await expect(repository.update("id", { name: "Error" })).rejects.toMatchObject({ status: 500 });
-    await expect(repository.delete("id")).rejects.toMatchObject({ status: 500 });
   });
 
   it("resolves array message inside request error handling", async () => {

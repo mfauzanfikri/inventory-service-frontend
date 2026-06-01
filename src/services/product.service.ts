@@ -163,21 +163,7 @@ export function createProductService(repository: ProductDomainRepository) {
       }
     },
 
-    async delete(id: string): Promise<ProductResult<void>> {
-      try {
-        const deleted = await repository.delete(id);
-        if (!deleted) {
-          return failure({
-            code: "NOT_FOUND",
-            message: "Product not found",
-            category: "application",
-          });
-        }
-        return success(undefined);
-      } catch (error: unknown) {
-        return failure(mapProductError(error));
-      }
-    },
+
 
     async adjustStock(
       id: string,

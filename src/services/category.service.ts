@@ -123,22 +123,7 @@ export function createCategoryService(repository: CategoryDomainRepository) {
       }
     },
 
-    async delete(id: string): Promise<CategoryResult<void>> {
-      try {
-        const deleted = await repository.delete(id);
-        if(!deleted) {
-          return failure({
-            code: "NOT_FOUND",
-            message: "Category not found",
-            category: "application",
-          });
-        }
 
-        return success(undefined);
-      } catch (error: unknown) {
-        return failure(mapCategoryError(error));
-      }
-    },
 
     async getByName(name: string): Promise<CategoryResult<Category>> {
       try {

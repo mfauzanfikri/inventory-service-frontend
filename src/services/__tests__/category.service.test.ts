@@ -7,7 +7,6 @@ describe("CategoryService", () => {
     findByName: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
   };
 
   const service = createCategoryService(mockRepository);
@@ -108,42 +107,7 @@ describe("CategoryService", () => {
     }
   });
 
-  it("returns success when deleting existing category", async () => {
-    mockRepository.delete.mockResolvedValue({
-      id: "target-id",
-      name: "Deleted",
-      description: "Deleted",
-      status: "active",
-    });
 
-    const result = await service.delete("target-id");
-
-    expect(result.ok).toBe(true);
-  });
-
-  it("returns not found result when delete target is missing", async () => {
-    mockRepository.delete.mockResolvedValue(null);
-
-    const result = await service.delete("missing-id");
-
-    expect(result.ok).toBe(false);
-    if(!result.ok) {
-      expect(result.error.code).toBe("NOT_FOUND");
-    }
-  });
-
-  it("returns infrastructure error when delete fails", async () => {
-    const error = new Error("Connection failed") as Error & { status?: number };
-    error.status = 500;
-    mockRepository.delete.mockRejectedValue(error);
-
-    const result = await service.delete("target-id");
-
-    expect(result.ok).toBe(false);
-    if(!result.ok) {
-      expect(result.error.code).toBe("INFRASTRUCTURE_ERROR");
-    }
-  });
 
   it("maps repository HTTP 503 error to INFRASTRUCTURE_ERROR", async () => {
     const error = new Error("Service unavailable") as Error & { status?: number };
