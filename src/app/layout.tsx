@@ -9,6 +9,14 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+export const metadata = {
+  title: {
+    default: "My Inventory",
+    template: "%s | My Inventory",
+  },
+  description: "A professional inventory management system",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

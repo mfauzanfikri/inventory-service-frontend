@@ -23,6 +23,15 @@ export function DashboardClient({ initialProducts }: DashboardClientProps) {
   }, []);
 
   const handleRefresh = async (silent = false) => {
+    if (!silent && lastSynced) {
+      const elapsed = Date.now() - lastSynced.getTime();
+      if (elapsed < 10000) {
+        const remaining = Math.ceil((10000 - elapsed) / 1000);
+        toast.warning(`Please wait ${remaining}s before manual reload`);
+        return;
+      }
+    }
+
     if (!silent) setIsRefreshing(true);
     try {
       const result = await getProductsAction();
