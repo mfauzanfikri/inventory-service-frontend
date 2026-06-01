@@ -12,14 +12,17 @@ import { CategoryActions } from "./category-actions";
 
 interface GetColumnsProps {
   onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
+  onDeactivate: (category: Category) => void;
+  onActivate: (category: Category) => void;
+  togglingId: string | null;
 }
 
-export function getColumns(
-  {
-    onEdit,
-    onDelete,
-  }: GetColumnsProps): ColumnDef<Category>[] {
+export function getColumns({
+  onEdit,
+  onDeactivate,
+  onActivate,
+  togglingId,
+}: GetColumnsProps): ColumnDef<Category>[] {
   return [
     {
       accessorKey: "name",
@@ -125,7 +128,9 @@ export function getColumns(
         <CategoryActions
           category={row.original}
           onEdit={onEdit}
-          onDelete={onDelete}
+          onDeactivate={onDeactivate}
+          onActivate={onActivate}
+          togglingId={togglingId}
         />
       ),
       enableSorting: false,

@@ -5,29 +5,52 @@ import { DataTable } from "@/components/ui/data-table";
 import { Category } from "@/types/category";
 import { AddCategoryModal } from "./add-category-modal";
 import { EditCategoryModal } from "./edit-category-modal";
-import { DeleteCategoryModal } from "./delete-category-modal";
+import { DeactivateCategoryModal } from "./deactivate-category-modal";
 import { getColumns } from "./columns";
+import { updateCategoryAction } from "../actions";
+import { toast } from "sonner";
 
 interface CategoryTableProps {
   data: Category[];
 }
 
 export function CategoryTable({ data }: CategoryTableProps) {
-  const [selectedCategory, setSelectedCategory] =
-    useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const columns = getColumns({
     onEdit: (category) => {
       setSelectedCategory(category);
       setEditOpen(true);
     },
-    onDelete: (category) => {
+    onDeactivate: (category) => {
       setSelectedCategory(category);
-      setDeleteOpen(true);
+      setDeactivateOpen(true);
     },
+    onActivate: async (category) => {
+      try {
+        setTogglingId(category.id);
+        const result = await updateCategoryAction(category.id, { status: "active" });
+        if (!result.ok) {
+          toast.error(result.error.message || "Failed to activate category. Please try again.", {
+            position: "top-center",
+          });
+          return;
+        }
+        toast.success(
+          <span>
+            Category <b className="font-bold">{category.name}</b> has been activated successfully
+          </span>,
+          { position: "top-center" }
+        );
+      } finally {
+        setTogglingId(null);
+      }
+    },
+    togglingId,
   });
 
   return (
@@ -44,9 +67,9 @@ export function CategoryTable({ data }: CategoryTableProps) {
         category={selectedCategory}
       />
 
-      <DeleteCategoryModal
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
+      <DeactivateCategoryModal
+        open={deactivateOpen}
+        onOpenChange={setDeactivateOpen}
         category={selectedCategory}
       />
     </>

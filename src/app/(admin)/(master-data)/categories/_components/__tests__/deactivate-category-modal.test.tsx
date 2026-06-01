@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { DeleteCategoryModal } from '../delete-category-modal';
-import { deleteCategoryAction } from '../../actions';
+import { DeactivateCategoryModal } from '../deactivate-category-modal';
+import { updateCategoryAction } from '../../actions';
 import { Category } from '@/types/category';
 import { toast } from 'sonner';
 
 jest.mock('../../actions', () => ({
-  deleteCategoryAction: jest.fn(),
+  updateCategoryAction: jest.fn(),
 }));
 
 jest.mock('sonner', () => ({
@@ -15,7 +15,7 @@ jest.mock('sonner', () => ({
   },
 }));
 
-describe('DeleteCategoryModal', () => {
+describe('DeactivateCategoryModal', () => {
   const mockCategory: Category = {
     id: 'test-1',
     name: 'Electronics',
@@ -31,7 +31,7 @@ describe('DeleteCategoryModal', () => {
 
   it('should not render when category is null', () => {
     const { container } = render(
-      <DeleteCategoryModal
+      <DeactivateCategoryModal
         open={true}
         onOpenChange={mockOnOpenChange}
         category={null}
@@ -40,51 +40,51 @@ describe('DeleteCategoryModal', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('should call deleteCategoryAction when delete button is clicked', async () => {
-    (deleteCategoryAction as jest.Mock).mockResolvedValue({ ok: true, data: undefined });
+  it('should call updateCategoryAction with status inactive when deactivate button is clicked', async () => {
+    (updateCategoryAction as jest.Mock).mockResolvedValue({ ok: true, data: undefined });
 
     render(
-      <DeleteCategoryModal
+      <DeactivateCategoryModal
         open={true}
         onOpenChange={mockOnOpenChange}
         category={mockCategory}
       />
     );
 
-    const deleteButton = screen.getByRole('button', { name: /delete/i });
-    fireEvent.click(deleteButton);
+    const deactivateButton = screen.getByRole('button', { name: /deactivate/i });
+    fireEvent.click(deactivateButton);
 
     await waitFor(() => {
-      expect(deleteCategoryAction).toHaveBeenCalledWith(mockCategory.id);
+      expect(updateCategoryAction).toHaveBeenCalledWith(mockCategory.id, { status: "inactive" });
     });
 
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('should show error toast if deletion fails', async () => {
-    (deleteCategoryAction as jest.Mock).mockResolvedValue({
+  it('should show error toast if deactivation fails', async () => {
+    (updateCategoryAction as jest.Mock).mockResolvedValue({
       ok: false,
       error: {
         code: 'UNKNOWN_ERROR',
-        message: 'Failed to delete category. Please try again.',
+        message: 'Failed to deactivate category. Please try again.',
         category: 'unknown',
       },
     });
 
     render(
-      <DeleteCategoryModal
+      <DeactivateCategoryModal
         open={true}
         onOpenChange={mockOnOpenChange}
         category={mockCategory}
       />
     );
 
-    const deleteButton = screen.getByRole('button', { name: /delete/i });
-    fireEvent.click(deleteButton);
+    const deactivateButton = screen.getByRole('button', { name: /deactivate/i });
+    fireEvent.click(deactivateButton);
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to delete category'),
+        expect.stringContaining('Failed to deactivate category'),
         expect.any(Object)
       );
     });

@@ -24,11 +24,4 @@ export async function updateCategoryAction(id: string, data: CategoryUpdateInput
   return result;
 }
 
-export async function deleteCategoryAction(id: string): Promise<ActionResult<void>> {
-  const result = await categoryService.delete(id);
-  if(result.ok) {
-    revalidatePath("/categories");
-  }
 
-  return result;
-}

@@ -12,51 +12,46 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Category } from "@/types/category";
-import { deleteCategoryAction } from "../actions";
+import { updateCategoryAction } from "../actions";
 import { toast } from "sonner";
 
-interface DeleteCategoryModalProps {
+interface DeactivateCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category: Category | null;
 }
 
-export function DeleteCategoryModal(
-  {
-    open,
-    onOpenChange,
-    category,
-  }: DeleteCategoryModalProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+export function DeactivateCategoryModal({
+  open,
+  onOpenChange,
+  category,
+}: DeactivateCategoryModalProps) {
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
   if(!category) return null;
 
-  const handleDelete = async () => {
+  const handleDeactivate = async () => {
     try {
-      setIsDeleting(true);
-      const result = await deleteCategoryAction(category.id);
+      setIsDeactivating(true);
+      const result = await updateCategoryAction(category.id, { status: "inactive" });
 
       if(!result.ok) {
-        toast.error(result.error.message || "Failed to delete category. Please try again.", {
+        toast.error(result.error.message || "Failed to deactivate category. Please try again.", {
           position: "top-center",
         });
         return;
       }
 
-      const message = (
+      toast.success(
         <span>
-          <b className="font-bold">{category.name}</b> category has been
-          deleted
-        </span>
+          Category <b className="font-bold">{category.name}</b> has been deactivated successfully
+        </span>,
+        { position: "top-center" }
       );
-
-      toast.success(message, {
-        position: "top-center",
-      });
 
       onOpenChange(false);
     } finally {
-      setIsDeleting(false);
+      setIsDeactivating(false);
     }
   };
 
@@ -64,10 +59,10 @@ export function DeleteCategoryModal(
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Category</DialogTitle>
+          <DialogTitle>Deactivate Category</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete{" "}
-            <strong>{category.name}</strong>?
+            Are you sure you want to deactivate <strong>{category.name}</strong>? 
+            Existing products within this category will remain preserved.
           </DialogDescription>
         </DialogHeader>
 
@@ -76,7 +71,7 @@ export function DeleteCategoryModal(
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
+            disabled={isDeactivating}
           >
             Cancel
           </Button>
@@ -84,15 +79,15 @@ export function DeleteCategoryModal(
           <Button
             type="button"
             variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
+            onClick={handleDeactivate}
+            disabled={isDeactivating}
           >
-            {isDeleting ? (
+            {isDeactivating ? (
               <>
-                <Spinner /> Delete
+                <Spinner /> Deactivate
               </>
             ) : (
-              "Delete"
+              "Deactivate"
             )}
           </Button>
         </DialogFooter>
