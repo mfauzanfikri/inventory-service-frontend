@@ -37,7 +37,6 @@ const schema = z.object({
   unitOfMeasure: z.string().min(1, "Unit of measure is required"),
   categoryId: z.string().min(1, "Category must be selected"),
   initialStock: z.coerce.number().int().nonnegative("Initial stock cannot be negative").default(0),
-  status: z.enum(["active", "inactive"]),
 });
 
 type FormInput = z.input<typeof schema>;
@@ -49,7 +48,6 @@ const defaultValues: DefaultValues<FormInput> = {
   unitOfMeasure: "",
   categoryId: "",
   initialStock: 0,
-  status: "active",
 };
 
 export function AddProductModal({ categories }: AddProductModalProps) {
@@ -69,7 +67,10 @@ export function AddProductModal({ categories }: AddProductModalProps) {
   });
 
   const onSubmit = async (data: FormData) => {
-    const result = await createProductAction(data);
+    const result = await createProductAction({
+      ...data,
+      status: "active",
+    });
 
     if(!result.ok) {
       if(result.error.field === "sku") {
@@ -202,26 +203,6 @@ export function AddProductModal({ categories }: AddProductModalProps) {
               {errors.initialStock && <FieldError>{errors.initialStock.message}</FieldError>}
             </Field>
 
-            {/* Status Selection */}
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="product-status">Status</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="product-status" aria-invalid={fieldState.invalid}>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
-                </Field>
-              )}
-            />
           </FieldGroup>
 
           <DialogFooter>
