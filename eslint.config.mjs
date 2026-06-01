@@ -8,6 +8,8 @@ export default defineConfig([
     '.next/**',
     'out/**',
     'build/**',
-    'next-env.d.ts'
+    'next-env.d.ts',
+    'coverage/**',
+    'templates/**'
   ]),
 ])

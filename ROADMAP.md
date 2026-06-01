@@ -15,8 +15,8 @@
 | **US-PROD-03** | Implement soft-deactivation toggle badge for inactive product states | [x] |
 | **US-PROD-04** | Build products list table displaying columns: name, SKU, category, status, and unit of measure | [x] |
 | **US-STOCK-01** | Add an optional initial stock quantity input field to the product creation flow | [x] |
-| **US-STOCK-02** | Add stock increment action inputs (`+` triggers) next to stock counts | [x] |
-| **US-STOCK-03** | Add stock decrement action inputs (`-` triggers) next to stock counts | [x] |
+| **US-STOCK-02** | Add stock adjustment action button next to stock counts to open adjust modal | [x] |
+| **US-STOCK-03** | Support stock decrement and increment adjustments inside the adjustment modal | [x] |
 | **US-STOCK-03** | Implement client-side error handling displaying insufficient stock alerts from backend API | [x] |
 | **US-MON-01** | Build an interactive inventory dashboard | [x] |
 | **US-MON-01** | Highlight out-of-stock items in bright red, and low-stock items in amber/orange alert states | [x] |
