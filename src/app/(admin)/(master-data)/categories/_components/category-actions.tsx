@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Category } from "@/types/category";
 import { Spinner } from "@/components/ui/spinner";
+import { Edit, Ban, Check } from "lucide-react";
 
 interface CategoryActionsProps {
   category: Category;
@@ -22,38 +23,46 @@ export function CategoryActions({
   const isToggling = togglingId === category.id;
 
   return (
-    <div className="flex justify-center gap-1">
+    <div className="flex justify-center gap-2">
       <Button
         variant="outline"
+        size="icon"
+        className="h-8 w-8 text-amber-600 hover:text-amber-700"
         onClick={() => onEdit(category)}
+        title="Edit Category"
         disabled={isToggling}
       >
-        Edit
+        <Edit className="h-4 w-4" />
       </Button>
 
       {isToggling ? (
         <Button
           variant="outline"
+          size="icon"
+          className="h-8 w-8"
           disabled
-          className="min-w-[85px]"
         >
           <Spinner className="h-4 w-4" />
         </Button>
       ) : category.status === "active" ? (
         <Button
-          variant="destructive"
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 text-red-600 hover:text-red-700"
           onClick={() => onDeactivate(category)}
-          className="min-w-[85px]"
+          title="Deactivate Category"
         >
-          Deactivate
+          <Ban className="h-4 w-4" />
         </Button>
       ) : (
         <Button
           variant="outline"
+          size="icon"
+          className="h-8 w-8 text-green-600 hover:text-green-700"
           onClick={() => onActivate(category)}
-          className="bg-green-600 hover:bg-green-700 text-white hover:text-white border-transparent hover:border-transparent min-w-[85px]"
+          title="Activate Category"
         >
-          Activate
+          <Check className="h-4 w-4" />
         </Button>
       )}
     </div>
