@@ -15,7 +15,7 @@ A feature-rich, high-performance inventory management admin dashboard built usin
 
 ## 📂 Architecture & Directory Structure
 
-The codebase is built on **Domain-Driven Design (DDD)** and Clean Application Layering:
+The codebase uses a clean, layered architecture style (Services, Repositories, Domain models):
 
 ```text
 src/
