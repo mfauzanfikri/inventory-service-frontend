@@ -1,22 +1,25 @@
-# Frontend Implementation Roadmap
-**Service:** Inventory Service User Interface (Next.js + TailwindCSS + Shadcn/ui)
+# Frontend Roadmap - Inventory Service UI
+**Repository:** `inventory-service-frontend`  
+**Latest Specifications Milestone:** `v2`
 
-| User Story ID | Frontend Verification Criteria / Technical Requirement | Status |
-| :--- | :--- | :--- |
-| **US-CAT-01** | Define TypeScript interfaces for category models and responses | [x] |
-| **US-CAT-01** | Build `add-category-modal` with inline validation checking for non-empty names | [x] |
-| **US-CAT-02** | Build `edit-category-modal` for category updates | [x] |
-| **US-CAT-03** | Build active/inactive status toggle switch inside the edit form | [x] |
-| **US-CAT-04** | Build data table displaying category name and status badge | [x] |
-| **US-CAT-04** | Style active (green/purple) vs. inactive (orange/gray) badge states | [x] |
-| **US-PROD-01** | Build product creation modal with custom selection dropdown for active categories | [x] |
-| **US-PROD-01** | Implement validations checking for unique SKU formats, required names, and category selection | [x] |
-| **US-PROD-02** | Build `edit-product-modal` to update name, unit of measure, category, and status | [x] |
-| **US-PROD-03** | Implement soft-deactivation toggle badge for inactive product states | [x] |
-| **US-PROD-04** | Build products list table displaying columns: name, SKU, category, status, and unit of measure | [x] |
-| **US-STOCK-01** | Add an optional initial stock quantity input field to the product creation flow | [x] |
-| **US-STOCK-02** | Add stock adjustment action button next to stock counts to open adjust modal | [x] |
-| **US-STOCK-03** | Support stock decrement and increment adjustments inside the adjustment modal | [x] |
-| **US-STOCK-03** | Implement client-side error handling displaying insufficient stock alerts from backend API | [x] |
-| **US-MON-01** | Build an interactive inventory dashboard | [x] |
-| **US-MON-01** | Highlight out-of-stock items in bright red, and low-stock items in amber/orange alert states | [x] |
+This active roadmap tracks frontend implementation tasks and verification criteria. ROADMAPs are strictly future-oriented. Completed tasks are documented in the codebase `CHANGELOG.md`.
+
+---
+
+## 1. Active Roadmap Tasks
+All core user stories, UI components, and client-side error handling from the specifications (v1.2) have been successfully completed, styled on `shadcn/ui`, and shipped.
+
+| Verification Criteria ID | User Story ID | Technical Verification Criteria | Status |
+| :--- | :--- | :--- | :--- |
+| - | - | *No active/incomplete tasks on the roadmap.* | - |
+
+---
+
+## 2. Release & Execution Summary
+All completed frontend implementations have been successfully migrated and recorded in the codebase [CHANGELOG.md](CHANGELOG.md).
+
+For verification evidence, trace the corresponding HTML anchors in the changelog:
+* **Category UI**: Implemented category TypeScript models, `add-category-modal`, `edit-category-modal`, active/inactive badge styling, and sorted data tables under `FE-US-CAT-01-001` through `FE-US-CAT-04-002`.
+* **Product UI**: Implemented product registration forms with active category filters, immutable SKU edits, soft-deactivation toggle badges, and catalog tables under `FE-US-PROD-01-001` through `FE-US-PROD-04-001`.
+* **Stock UI**: Implemented starting stock field, adjustment modals triggering increment/decrement requests, and client-side API error handling under `FE-US-STOCK-01-001` through `FE-US-STOCK-03-002`.
+* **Inventory Dashboard**: Implemented metrics, out-of-stock highlights, and low-stock amber warnings under `FE-US-MON-01-001` and `FE-US-MON-01-002`.
