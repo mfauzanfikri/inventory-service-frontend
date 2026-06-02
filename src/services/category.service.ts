@@ -1,70 +1,16 @@
 import { CategoryDescription, CategoryDomainRepository, CategoryEntity, CategoryName } from "@/domain/category";
-import { AppError, getErrorCode, infrastructureError, unknownError } from "@/lib/errors/app-error";
+import { AppError } from "@/lib/errors/app-error";
+import { mapApiError } from "@/lib/errors/api-error-mapper";
 import { failure, Result, success } from "@/lib/result";
 import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
 import { createApiCategoryRepository } from "@/infrastructure/category/category.api.repository";
 
 function mapCategoryError(error: unknown): AppError {
-  const code = getErrorCode(error);
-  const status =
-    typeof error === "object" && error !== null && "status" in error
-      ? (error as { status?: unknown }).status
-      : undefined;
-  const message =
-    typeof error === "object" && error !== null && "message" in error
-      ? (error as { message?: unknown }).message
-      : undefined;
-  const details =
-    typeof error === "object" && error !== null && "details" in error
-      ? (error as { details?: unknown }).details
-      : undefined;
-
-  if(
-    code === "CATEGORY_NAME_CONFLICT" ||
-    code === "CONFLICT" ||
-    status === 409
-  ) {
-    return {
-      code: "CONFLICT",
-      message: typeof message === "string" && message.length > 0 ? message : "Category name already exists",
-      category: "domain",
-      field: "name",
-    };
-  }
-
-  if(code === "CATEGORY_NOT_FOUND" || code === "NOT_FOUND" || status === 404) {
-    return {
-      code: "NOT_FOUND",
-      message: typeof message === "string" && message.length > 0 ? message : "Category not found",
-      category: "domain",
-    };
-  }
-
-  if(code === "INFRASTRUCTURE" || code === "INFRASTRUCTURE_ERROR") {
-    return infrastructureError(typeof message === "string" && message.length > 0 ? message : undefined);
-  }
-
-  if(code === "VALIDATION_ERROR") {
-    const field =
-      typeof details === "object" &&
-      details !== null &&
-      !Array.isArray(details)
-        ? Object.keys(details as Record<string, unknown>)[0]
-        : undefined;
-
-    return {
-      code: "VALIDATION_ERROR",
-      message: typeof message === "string" && message.length > 0 ? message : "Validation failed",
-      category: "application",
-      field,
-    };
-  }
-
-  if(status === 500 || status === 502 || status === 503 || status === 504) {
-    return infrastructureError(typeof message === "string" && message.length > 0 ? message : undefined);
-  }
-
-  return unknownError();
+  return mapApiError(error, {
+    conflictField: "name",
+    defaultConflictMessage: "Category name already exists",
+    defaultNotFoundMessage: "Category not found",
+  });
 }
 
 export type CategoryResult<T> = Result<T, AppError>;
@@ -145,6 +91,4 @@ export function createCategoryService(repository: CategoryDomainRepository) {
   };
 }
 
-// To switch drivers manually, toggle between createApiCategoryRepository and createInMemoryCategoryRepository here:
 export const categoryService = createCategoryService(createApiCategoryRepository());
-// export const categoryService = createCategoryService(createInMemoryCategoryRepository());

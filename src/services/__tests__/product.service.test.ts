@@ -84,7 +84,8 @@ describe("ProductService", () => {
     expect(result.ok).toBe(false);
     expect(mockRepository.create).not.toHaveBeenCalled();
     if (!result.ok) {
-      expect(result.error.code).toBe("UNKNOWN_ERROR");
+      expect(result.error.code).toBe("VALIDATION_ERROR");
+      expect(result.error.field).toBe("name");
     }
   });
 
