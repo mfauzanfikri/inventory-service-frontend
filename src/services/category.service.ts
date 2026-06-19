@@ -1,5 +1,5 @@
 import { CategoryDescription, CategoryDomainRepository, CategoryEntity, CategoryName } from "@/domain/category";
-import { AppError } from "@/lib/errors/app-error";
+import { AppError, infrastructureError } from "@/lib/errors/app-error";
 import { mapApiError } from "@/lib/errors/api-error-mapper";
 import { failure, Result, success } from "@/lib/result";
 import { Category, CategoryCreateInput, CategoryUpdateInput } from "@/types/category";
