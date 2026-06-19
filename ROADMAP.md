@@ -1,6 +1,6 @@
 # Frontend Roadmap - Inventory Service UI
 **Repository:** `inventory-service-frontend`  
-**Documentation Blueprint Version:** 2  
+**Documentation Blueprint Version:** 3  
 **Latest Specifications Milestone:** `1.3`
 
 This active roadmap tracks frontend implementation tasks and verification criteria. ROADMAPs are strictly future-oriented. Completed tasks are documented in the codebase `CHANGELOG.md`.
@@ -12,7 +12,7 @@ The following active frontend roadmap tasks trace to the Project Version 1.3 Sys
 
 | Verification Criteria ID | User Story ID | Technical Verification Criteria | Status |
 | :--- | :--- | :--- | :--- |
-| <a id="FE-US-SYS-01-001"></a>`FE-US-SYS-01-001` | **US-SYS-01** | **Interface TypeScript Model Upgrade:** Add the new metadata and version fields to the Category, Product, and Stock TypeScript models to ensure compilation and display-level compatibility. Concurrency check UI handling and client PATCH payloads are deferred. | `[ ]` |
+| <a id="FE-US-SYS-01-001"></a>`FE-US-SYS-01-001` | **US-SYS-01** | **Interface TypeScript Model Upgrade:** Add the new metadata and version fields to the Category, Product, and Stock TypeScript models to ensure compilation and display-level compatibility. Concurrency check UI handling and client PATCH payloads are deferred. | `[x]` |
 
 ---
 

@@ -6,6 +6,23 @@ This repository tracks codebase changes via **Service Versions (`MAJOR.MINOR.PAT
 
 ---
 
+## [1.3.0] - 2026-06-19
+This release aligns the frontend interfaces with the Project Version 1.3 System Metadata Foundation specifications, upgrades the TypeScript category and product models, and resolves legacy import compilation errors.
+
+### Added
+* **Metadata & Version Fields**:
+  * <a id="FE-US-SYS-01-001"></a>Added `version`, `createdBy`, and `updatedBy` properties to the `Category` and `Product` TypeScript interfaces, and `version` and `updatedBy` to the `Stock` TypeScript interface (`FE-US-SYS-01-001`).
+
+### Changed
+* **User Profile Components Standardized**:
+  * Corrected broken legacy imports of `Button` and `Label` in profile card components (`UserAddressCard.tsx`, `UserInfoCard.tsx`, `UserMetaCard.tsx`) to reference the unified `shadcn/ui` components (`@/components/ui/button` and `@/components/ui/label`).
+* **Version Bump**: Bumped root package version in `package.json` to `1.3.0`.
+* **Documentation Update**:
+  * Completed `FE-US-SYS-01-001` task in `ROADMAP.md`.
+  * Updated `README.md` metadata block to reflect version `1.3.0` and blueprint version `3`.
+
+---
+
 ## [1.2.1] - 2026-06-02
 This release cleans up duplicate UI systems, standardizes visual components on `shadcn/ui`, removes obsolete demo folders, extracts a shared API error normalizer, and aligns architectural documentation.
 

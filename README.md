@@ -1,11 +1,22 @@
 # Inventory Service UI
 
-## 1. Overview & Purpose
+## 1. Service Metadata
+| Field | Value |
+| :--- | :--- |
+| Service / Package Name | `inventory-service-frontend` |
+| Execution Boundary | `Frontend UI` |
+| Service Version | `1.3.0` |
+| Compatible Project Version | `1.3` |
+| Blueprint Version | `3` |
+| Release Status | `Active` |
+| Owner / Maintainer | `@mfauzanfikri` |
+
+## 2. Overview & Purpose
 The **Inventory Service UI** is a feature-rich, responsive operator control panel built to manage the product catalog, categorize catalog registers, and perform transaction-safe manual stock adjustments in the My-ERP system. It acts as the primary visual client for inventory managers, providing a live dashboard for low-stock monitoring, product registration forms, and category management lists.
 
 ---
 
-## 2. Technology Stack Mapping
+## 3. Technology Stack Mapping
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
 | **Framework** | Next.js (v15+) | Enterprise App Router engine, server components, and routing |
@@ -17,7 +28,7 @@ The **Inventory Service UI** is a feature-rich, responsive operator control pane
 
 ---
 
-## 3. Setup & Development Instructions
+## 4. Setup & Development Instructions
 
 ### Prerequisites
 * **Node.js**: `18.x` or later (Recommended: `20.x` or later)
@@ -54,7 +65,7 @@ npm run start
 
 ---
 
-## 4. Testing & Code Quality
+## 5. Testing & Code Quality
 Verify client component behaviors and custom data service rules:
 
 ```bash
@@ -70,7 +81,7 @@ npm run lint
 
 ---
 
-## 5. UI/UX & Specifications Compliance
+## 6. UI/UX & Specifications Compliance
 * **Non-destructive Toggles**: Direct resource deletes are blocked. Toggling categories or products to `inactive` retires them from operation while preserving historic data records.
 * **Real-time Synchronization**: Stock counts are fetched fresh on page loading or directly following adjustments.
 * **Low Stock / Zero Stock Highlights**: The dashboard automatically flags out-of-stock items in bright red (`quantity == 0`) and low-stock items in amber/orange (`0 < quantity < 5`).
@@ -78,7 +89,7 @@ npm run lint
 
 ---
 
-## 6. Documentation References
+## 7. Documentation References
 * **Documentation Blueprint**: [00_Documentation_Blueprint.md](../inventory-service-docs/00_Documentation_Blueprint.md)
 * **Product Requirements (PRD)**: [02_PRD.md](../inventory-service-docs/02_PRD.md)
 * **Technical Architecture**: [04_Architecture.md](../inventory-service-docs/04_Architecture.md)
