@@ -6,6 +6,18 @@ This repository tracks codebase changes via **Service Versions (`MAJOR.MINOR.PAT
 
 ---
 
+## [1.3.2] - 2026-06-19
+This release removes the redundant status selector from the Category and Product edit modals, streamlining form edits.
+
+### Removed
+* **Edit Modals Status Selection**: Removed the `status` select controls from `edit-category-modal.tsx` and `edit-product-modal.tsx` as status activation/deactivation is already managed via standalone action buttons on the tables.
+
+### Changed
+* **Unit Tests**: Updated `edit-category-modal.test.tsx` to remove the defunct status combobox rendering assertion.
+* **Version Bump**: Bumped root package version in `package.json` to `1.3.2`.
+
+---
+
 ## [1.3.1] - 2026-06-19
 This release simplifies the frontend system design by removing the redundant Domain-Driven Design (DDD) approach.
 
