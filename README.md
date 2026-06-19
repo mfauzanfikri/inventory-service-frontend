@@ -5,7 +5,7 @@
 | :--- | :--- |
 | Service / Package Name | `inventory-service-frontend` |
 | Execution Boundary | `Frontend UI` |
-| Service Version | `1.3.0` |
+| Service Version | `1.3.1` |
 | Compatible Project Version | `1.3` |
 | Blueprint Version | `3` |
 | Release Status | `Active` |

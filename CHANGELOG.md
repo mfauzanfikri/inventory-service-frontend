@@ -6,6 +6,20 @@ This repository tracks codebase changes via **Service Versions (`MAJOR.MINOR.PAT
 
 ---
 
+## [1.3.1] - 2026-06-19
+This release simplifies the frontend system design by removing the redundant Domain-Driven Design (DDD) approach.
+
+### Removed
+* **Domain Layer**: Deleted the `src/domain/` directory completely, including Domain Value Objects (`CategoryName`, `CategoryDescription`, `ProductName`, `ProductSKU`), Domain Entity models (`CategoryEntity`, `ProductEntity`), Domain Repository interfaces (`CategoryDomainRepository`, `ProductDomainRepository`), and their associated unit tests.
+
+### Changed
+* **Infrastructure Layer Simplification**: Simplified `category.api.repository.ts` and `product.api.repository.ts` by removing factory wrapper functions and dependency injection, exporting direct repository objects instead.
+* **Service Layer Simplification**: Refactored `category.service.ts` and `product.service.ts` to directly consume API repository objects, inline simple attribute validations, and export service objects directly.
+* **Service Unit Tests**: Rewrote service tests to mock repository modules directly using module mocks instead of manual factory mocking.
+* **Version Bump**: Bumped root package version in `package.json` to `1.3.1`.
+
+---
+
 ## [1.3.0] - 2026-06-19
 This release aligns the frontend interfaces with the Project Version 1.3 System Metadata Foundation specifications, upgrades the TypeScript category and product models, and resolves legacy import compilation errors.
 
