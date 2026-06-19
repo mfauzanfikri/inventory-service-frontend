@@ -1,6 +1,6 @@
-import { createApiCategoryRepository } from "./category.api.repository";
+import { categoryRepository } from "./category.api.repository";
 
-describe("createApiCategoryRepository", () => {
+describe("categoryRepository", () => {
   const originalFetch = global.fetch;
 
   afterEach(() => {
@@ -19,8 +19,7 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-    const data = await repository.findAll();
+    const data = await categoryRepository.findAll();
 
     expect(data).toHaveLength(1);
     expect(data[0].name).toBe("Electronics");
@@ -33,8 +32,7 @@ describe("createApiCategoryRepository", () => {
       json: async () => [{ id: "1", name: "Electronics Legacy", description: "Devices", status: "active" }],
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-    const data = await repository.findAll();
+    const data = await categoryRepository.findAll();
 
     expect(data).toHaveLength(1);
     expect(data[0].name).toBe("Electronics Legacy");
@@ -50,9 +48,7 @@ describe("createApiCategoryRepository", () => {
       },
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-
-    await expect(repository.findAll()).rejects.toMatchObject({
+    await expect(categoryRepository.findAll()).rejects.toMatchObject({
       status: 500,
       message: "Internal Server Error",
     });
@@ -72,10 +68,8 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-
     await expect(
-      repository.create({
+      categoryRepository.create({
         name: "Electronics",
         description: "Duplicate",
         status: "active",
@@ -100,8 +94,7 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-    const result = await repository.findByName("Missing");
+    const result = await categoryRepository.findByName("Missing");
 
     expect(result).toBeNull();
   });
@@ -118,8 +111,7 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-    const result = await repository.update("missing-id", { name: "Update" });
+    const result = await categoryRepository.update("missing-id", { name: "Update" });
 
     expect(result).toBeNull();
   });
@@ -135,10 +127,8 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-
-    await expect(repository.findByName("ErrorName")).rejects.toMatchObject({ status: 500 });
-    await expect(repository.update("id", { name: "Error" })).rejects.toMatchObject({ status: 500 });
+    await expect(categoryRepository.findByName("ErrorName")).rejects.toMatchObject({ status: 500 });
+    await expect(categoryRepository.update("id", { name: "Error" })).rejects.toMatchObject({ status: 500 });
   });
 
   it("resolves array message inside request error handling", async () => {
@@ -151,9 +141,7 @@ describe("createApiCategoryRepository", () => {
       }),
     }) as unknown as typeof fetch;
 
-    const repository = createApiCategoryRepository();
-
-    await expect(repository.findAll()).rejects.toMatchObject({
+    await expect(categoryRepository.findAll()).rejects.toMatchObject({
       status: 400,
       message: "Name is required",
     });
