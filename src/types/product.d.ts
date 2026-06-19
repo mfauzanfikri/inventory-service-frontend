@@ -8,7 +8,9 @@ export const ProductStatus: {
 
 export type Stock = {
   quantity: number;
+  version: number;
   updatedAt: Date;
+  updatedBy: string;
 };
 
 export type Product = {
@@ -20,11 +22,14 @@ export type Product = {
   categoryId: string;
   category: Category;
   stock: Stock;
+  version: number;
   createdAt: Date;
+  createdBy: string;
   updatedAt: Date;
+  updatedBy: string;
 };
 
-export type ProductCreateInput = Omit<Product, 'id' | 'category' | 'stock' | 'createdAt' | 'updatedAt'> & {
+export type ProductCreateInput = Omit<Product, 'id' | 'category' | 'stock' | 'createdAt' | 'updatedAt' | 'version' | 'createdBy' | 'updatedBy'> & {
   initialStock?: number;
 };
 export type ProductUpdateInput = Partial<Omit<ProductCreateInput, 'initialStock' | 'sku'>>;
