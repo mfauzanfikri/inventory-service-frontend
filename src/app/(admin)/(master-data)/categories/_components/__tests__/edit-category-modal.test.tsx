@@ -51,7 +51,6 @@ describe('EditCategoryModal', () => {
 
     expect(screen.getByLabelText(/name/i)).toHaveValue(mockCategory.name);
     expect(screen.getByLabelText(/description/i)).toHaveValue(mockCategory.description);
-    expect(screen.getByRole('combobox')).toHaveTextContent(/active/i);
   });
 
   it('should call updateCategoryAction with only dirty fields', async () => {

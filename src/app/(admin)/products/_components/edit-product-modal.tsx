@@ -27,7 +27,6 @@ const schema = z.object({
   name: z.string().min(3, "Product name must be at least 3 characters"),
   unitOfMeasure: z.string().min(1, "Unit of measure is required"),
   categoryId: z.string().min(1, "Category must be selected"),
-  status: z.enum(["active", "inactive"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -64,7 +63,6 @@ export function EditProductModal({
         name: product.name,
         unitOfMeasure: product.unitOfMeasure,
         categoryId: product.categoryId,
-        status: product.status,
       });
     }
   }, [product, open, reset]);
@@ -76,7 +74,6 @@ export function EditProductModal({
     if (dirtyFields.name) changedFields.name = data.name;
     if (dirtyFields.unitOfMeasure) changedFields.unitOfMeasure = data.unitOfMeasure;
     if (dirtyFields.categoryId) changedFields.categoryId = data.categoryId;
-    if (dirtyFields.status) changedFields.status = data.status;
 
     if (Object.keys(changedFields).length === 0) {
       onOpenChange(false);
@@ -169,27 +166,6 @@ export function EditProductModal({
                           {c.name} {c.status === "inactive" ? "(Inactive)" : ""}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
-                </Field>
-              )}
-            />
-
-            {/* Status Selector */}
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="edit-status">Status</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="edit-status" aria-invalid={fieldState.invalid}>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                   {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}

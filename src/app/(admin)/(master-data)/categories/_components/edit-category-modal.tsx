@@ -29,14 +29,9 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateCategoryAction } from "../actions";
 
-const statusOptions = ["active", "inactive"] as const;
-
 const schema = z.object({
   name: z.string().min(3, "Name too short"),
   description: z.string().optional(),
-  status: z.enum(statusOptions, {
-    error: "Please select a valid status",
-  }),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -68,7 +63,6 @@ export function EditCategoryModal({
       reset({
         name: category.name,
         description: category.description,
-        status: category.status ?? ("" as "active"),
       });
     }
   }, [category, open, reset]);
@@ -79,7 +73,6 @@ export function EditCategoryModal({
     const changedFields: CategoryUpdateInput = {};
     if (dirtyFields.name) changedFields.name = data.name;
     if (dirtyFields.description) changedFields.description = data.description || "";
-    if (dirtyFields.status) changedFields.status = data.status;
 
     if(Object.keys(changedFields).length === 0) {
       onOpenChange(false);
@@ -145,34 +138,6 @@ export function EditCategoryModal({
                 <FieldError>{errors.description.message}</FieldError>
               )}
             </Field>
-
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="edit-status">Status</FieldLabel>
-
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      id="edit-status"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {fieldState.error && (
-                    <FieldError>{fieldState.error.message}</FieldError>
-                  )}
-                </Field>
-              )}
-            />
           </FieldGroup>
 
           <DialogFooter>
